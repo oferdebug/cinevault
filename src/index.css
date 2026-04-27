@@ -1,0 +1,170 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
+
+@import "tailwindcss";
+
+@theme {
+    --color-primary: #020617;
+
+    --color-light-100: #f8fafc;
+    --color-light-200: #bae6fd;
+
+    --color-gray-100: #94a3b8;
+
+    --color-dark-100: #111827;
+
+    --color-accent: #38bdf8;
+
+    --font-dm-sans: DM Sans, sans-serif;
+
+    --breakpoint-xs: 480px;
+
+    --background-image-hero-pattern:
+            radial-gradient(circle at top, rgba(56, 189, 248, 0.16), transparent 34%),
+            radial-gradient(circle at 50% 45%, rgba(17, 24, 39, 0.85), transparent 48%),
+            linear-gradient(180deg, #020617 0%, #030712 52%, #020617 100%);
+}
+
+@layer base {
+    body {
+        font-family: "DM Sans", serif;
+        font-optical-sizing: auto;
+        background: #020617;
+        color: #f8fafc;
+    }
+
+    h1 {
+        @apply mx-auto max-w-4xl text-center text-5xl font-bold leading-tight tracking-[-1%] text-light-100 sm:text-[64px] sm:leading-[76px];
+    }
+
+    h2 {
+        @apply text-2xl font-bold text-light-100 sm:text-3xl;
+    }
+
+    main {
+        @apply min-h-screen relative bg-primary overflow-hidden;
+    }
+
+    header {
+        @apply sm:mt-10 mt-5;
+    }
+
+    header img {
+        @apply w-full max-w-lg h-auto object-contain mx-auto drop-shadow-md;
+    }
+}
+
+@layer components {
+    .pattern {
+        @apply bg-hero-pattern w-full h-screen bg-center bg-cover absolute z-0;
+    }
+
+    .wrapper {
+        @apply px-5 py-12 xs:p-10 max-w-7xl mx-auto flex flex-col relative z-10;
+    }
+
+    .trending {
+        @apply mt-20;
+
+        & ul {
+            @apply flex flex-row overflow-y-auto gap-5 -mt-10 w-full hide-scrollbar;
+        }
+
+        & ul li {
+            @apply min-w-[230px] flex flex-row items-center;
+        }
+
+        & ul li p {
+            @apply fancy-text mt-[22px] text-nowrap;
+        }
+
+        & ul li img {
+            @apply w-[127px] h-[163px] rounded-xl object-cover -ml-3.5 shadow-lg shadow-accent/20;
+        }
+    }
+
+    .search {
+        @apply w-full bg-dark-100/80 border border-light-100/10 px-4 py-3 rounded-2xl mt-10 max-w-3xl mx-auto shadow-inner shadow-accent/10 backdrop-blur-md;
+
+        & div {
+            @apply relative flex items-center;
+        }
+
+        & img {
+            @apply absolute left-2 h-5 w-5 opacity-80;
+        }
+
+        & input {
+            @apply w-full bg-transparent py-2 sm:pr-10 pl-10 text-base text-light-100 placeholder-light-200 outline-hidden;
+        }
+    }
+
+    .all-movies {
+        @apply space-y-9;
+
+        & ul {
+            @apply grid grid-cols-1 gap-5 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4;
+        }
+    }
+
+    .movie-card {
+        @apply bg-dark-100/90 border border-light-100/10 p-5 rounded-2xl shadow-inner shadow-light-100/10 transition duration-300 hover:-translate-y-1 hover:border-accent/50 hover:shadow-lg hover:shadow-accent/20;
+
+        & img {
+            @apply rounded-xl h-auto w-full;
+        }
+
+        & h3 {
+            @apply text-light-100 font-bold text-base line-clamp-1 mt-4;
+        }
+
+        & .content {
+            @apply mt-2 flex flex-row items-center flex-wrap gap-2;
+        }
+
+        & .rating {
+            @apply flex flex-row items-center gap-1;
+        }
+
+        & .rating img {
+            @apply size-4 object-contain;
+        }
+
+        & .rating p {
+            @apply font-bold text-base text-light-100;
+        }
+
+        & .content span {
+            @apply text-sm text-gray-100;
+        }
+
+        & .content .lang {
+            @apply capitalize text-gray-100 font-medium text-base;
+        }
+
+        & .content .year {
+            @apply text-gray-100 font-medium text-base;
+        }
+    }
+}
+
+@utility text-gradient {
+    @apply bg-gradient-to-r from-[#F8FAFC] via-[#BAE6FD] to-[#38BDF8] bg-clip-text text-transparent;
+}
+
+@utility fancy-text {
+    -webkit-text-stroke: 5px rgba(56, 189, 248, 0.45);
+    font-size: 190px;
+    font-family: "Bebas Neue", sans-serif;
+    color: transparent;
+    text-shadow: 0 0 35px rgba(56, 189, 248, 0.22);
+}
+
+@utility hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}

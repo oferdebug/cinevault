@@ -1,0 +1,92 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cyan" x1="96" y1="64" x2="408" y2="448" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#67E8F9"/>
+      <stop offset="0.45" stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+
+    <linearGradient id="slate" x1="172" y1="146" x2="350" y2="366" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1E293B"/>
+      <stop offset="0.55" stop-color="#020617"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+
+    <linearGradient id="play" x1="232" y1="216" x2="294" y2="296" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#E0F2FE"/>
+      <stop offset="1" stop-color="#38BDF8"/>
+    </linearGradient>
+
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feColorMatrix in="blur" type="matrix"
+        values="0 0 0 0 0.2196
+                0 0 0 0 0.7412
+                0 0 0 0 0.9725
+                0 0 0 0.55 0"
+        result="cyanGlow"/>
+      <feMerge>
+        <feMergeNode in="cyanGlow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Transparent background: no rect, no background fill -->
+
+  <g filter="url(#softGlow)">
+    <!-- Main C / film strip shape -->
+    <path
+      d="M386 112
+         A184 184 0 1 0 386 400"
+      stroke="url(#cyan)"
+      stroke-width="74"
+      stroke-linecap="butt"
+    />
+
+    <!-- Inner dark cut to make C clean -->
+    <path
+      d="M356 154
+         A130 130 0 1 0 356 358"
+      stroke="#020617"
+      stroke-width="30"
+      stroke-linecap="butt"
+      opacity="0.88"
+    />
+
+    <!-- Film perforations -->
+    <g fill="#020617">
+      <rect x="122" y="172" width="24" height="20" rx="5" transform="rotate(-18 122 172)"/>
+      <rect x="102" y="222" width="26" height="22" rx="5" transform="rotate(-7 102 222)"/>
+      <rect x="98" y="279" width="26" height="22" rx="5" transform="rotate(6 98 279)"/>
+      <rect x="118" y="332" width="24" height="20" rx="5" transform="rotate(18 118 332)"/>
+    </g>
+
+    <!-- Vault circle -->
+    <circle cx="256" cy="256" r="104" fill="url(#slate)" stroke="#475569" stroke-width="6"/>
+    <circle cx="256" cy="256" r="78" fill="#07111F" stroke="#38BDF8" stroke-opacity="0.75" stroke-width="5"/>
+
+    <!-- Vault spokes -->
+    <g stroke="#64748B" stroke-width="8" stroke-linecap="round">
+      <line x1="256" y1="166" x2="256" y2="194"/>
+      <line x1="256" y1="318" x2="256" y2="346"/>
+      <line x1="166" y1="256" x2="194" y2="256"/>
+      <line x1="318" y1="256" x2="346" y2="256"/>
+      <line x1="193" y1="193" x2="213" y2="213"/>
+      <line x1="319" y1="193" x2="299" y2="213"/>
+      <line x1="193" y1="319" x2="213" y2="299"/>
+      <line x1="319" y1="319" x2="299" y2="299"/>
+    </g>
+
+    <!-- Play circle and triangle -->
+    <circle cx="256" cy="256" r="45" fill="#0B1D31" stroke="#38BDF8" stroke-width="4"/>
+    <path
+      d="M240 224V288L296 256L240 224Z"
+      fill="url(#play)"
+      stroke="#E0F2FE"
+      stroke-opacity="0.7"
+      stroke-width="2"
+      stroke-linejoin="round"
+    />
+  </g>
+</svg>

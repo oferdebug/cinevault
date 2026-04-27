@@ -1,0 +1,86 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#020617"/>
+      <stop offset="1" stop-color="#031129"/>
+    </linearGradient>
+    <linearGradient id="cgrad" x1="96" y1="72" x2="404" y2="424" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#67E8F9"/>
+      <stop offset="0.45" stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="172" y1="152" x2="340" y2="328" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#334155"/>
+      <stop offset="0.5" stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="play" x1="224" y1="214" x2="286" y2="288" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#E0F2FE"/>
+      <stop offset="1" stop-color="#38BDF8"/>
+    </linearGradient>
+    <filter id="glow" x="32" y="32" width="448" height="448" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="soft" x="0" y="0" width="512" height="512" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <mask id="c-mask">
+      <rect width="512" height="512" fill="black"/>
+      <circle cx="256" cy="256" r="150" fill="white"/>
+      <circle cx="256" cy="256" r="96" fill="black"/>
+      <rect x="290" y="72" width="170" height="368" fill="black"/>
+    </mask>
+  </defs>
+
+  <rect width="512" height="512" rx="0" fill="url(#bg)"/>
+  <ellipse cx="256" cy="408" rx="96" ry="10" fill="#38BDF8" opacity="0.35" filter="url(#soft)"/>
+
+  <g filter="url(#glow)" mask="url(#c-mask)">
+    <circle cx="256" cy="256" r="150" fill="url(#cgrad)"/>
+  </g>
+
+  <!-- film perforations -->
+  <g fill="#061226" opacity="0.95">
+    <rect x="120" y="165" width="28" height="22" rx="4" transform="rotate(-8 120 165)"/>
+    <rect x="112" y="213" width="30" height="24" rx="4" transform="rotate(-5 112 213)"/>
+    <rect x="110" y="268" width="30" height="24" rx="4" transform="rotate(0 110 268)"/>
+    <rect x="118" y="323" width="30" height="24" rx="4" transform="rotate(6 118 323)"/>
+    <rect x="142" y="370" width="28" height="22" rx="4" transform="rotate(12 142 370)"/>
+  </g>
+
+  <!-- outer C edge highlight -->
+  <path d="M357 111C330 91 295 80 257 80C159 80 80 159 80 257C80 355 159 434 257 434C296 434 332 422 360 400"
+        stroke="#BAE6FD" stroke-opacity="0.55" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- vault -->
+  <circle cx="256" cy="256" r="92" fill="url(#metal)" stroke="#475569" stroke-width="3"/>
+  <circle cx="256" cy="256" r="76" fill="#0B1324" stroke="#64748B" stroke-width="3"/>
+  <circle cx="256" cy="256" r="48" fill="#10203A" stroke="#1E3A5F" stroke-width="2"/>
+
+  <!-- vault spokes -->
+  <g stroke="#64748B" stroke-width="8" stroke-linecap="round">
+    <line x1="256" y1="198" x2="256" y2="170"/>
+    <line x1="256" y1="314" x2="256" y2="342"/>
+    <line x1="198" y1="256" x2="170" y2="256"/>
+    <line x1="314" y1="256" x2="342" y2="256"/>
+    <line x1="214" y1="214" x2="194" y2="194"/>
+    <line x1="298" y1="298" x2="318" y2="318"/>
+    <line x1="298" y1="214" x2="318" y2="194"/>
+    <line x1="214" y1="298" x2="194" y2="318"/>
+  </g>
+  <g fill="#0F172A" stroke="#475569" stroke-width="2">
+    <circle cx="256" cy="170" r="8"/>
+    <circle cx="256" cy="342" r="8"/>
+    <circle cx="170" cy="256" r="8"/>
+    <circle cx="342" cy="256" r="8"/>
+  </g>
+
+  <!-- play button -->
+  <circle cx="256" cy="256" r="38" fill="#133457"/>
+  <path d="M240 227L240 285L289 256L240 227Z" fill="url(#play)" stroke="#E0F2FE" stroke-opacity="0.5" stroke-width="1.5"/>
+  <circle cx="256" cy="256" r="40" stroke="#38BDF8" stroke-opacity="0.45" stroke-width="2"/>
+</svg>

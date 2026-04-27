@@ -1,0 +1,29 @@
+<svg width="220" height="220" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="searchGradientStrong" x1="42" y1="36" x2="186" y2="186" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#BAE6FD"/>
+      <stop offset="45%" stop-color="#7DD3FC"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+
+    <filter id="outerGlowStrong" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="baseBlur"/>
+      <feColorMatrix in="baseBlur" type="matrix" values="0 0 0 0 0.2196  0 0 0 0 0.7411  0 0 0 0 0.9725  0 0 0 1 0" result="glow1"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur2"/>
+      <feColorMatrix in="blur2" type="matrix" values="0 0 0 0 0.2196  0 0 0 0 0.7411  0 0 0 0 0.9725  0 0 0 0.8 0" result="glow2"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur3"/>
+      <feColorMatrix in="blur3" type="matrix" values="0 0 0 0 0.2196  0 0 0 0 0.7411  0 0 0 0 0.9725  0 0 0 0.45 0" result="glow3"/>
+      <feMerge>
+        <feMergeNode in="glow3"/>
+        <feMergeNode in="glow2"/>
+        <feMergeNode in="glow1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <g filter="url(#outerGlowStrong)">
+    <circle cx="92" cy="92" r="60" stroke="url(#searchGradientStrong)" stroke-width="14" stroke-linecap="round"/>
+    <line x1="134" y1="134" x2="182" y2="182" stroke="url(#searchGradientStrong)" stroke-width="14" stroke-linecap="round"/>
+  </g>
+</svg>
