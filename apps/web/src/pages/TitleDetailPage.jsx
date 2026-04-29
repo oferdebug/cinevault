@@ -53,6 +53,13 @@ const TitleDetailPage = () => {
 		: "/src/assets/No-Poster.png";
 	return (
 		<main className="min-h-screen bg-primary">
+			<button
+				onClick={() => navigate(-1)}
+				aria-label="Go back"
+				className="fixed top-24 left-8 z-20 text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm transition-colors"
+			>
+				← Back
+			</button>
 			{backdrop && (
 				<div className="relative h-[60vh] w-full overflow-hidden">
 					<img
@@ -61,12 +68,6 @@ const TitleDetailPage = () => {
 						className="w-full h-full object-cover"
 					/>
 					<div className="absolute inset-0 bg-linear-to-t from-primary via-primary/60 to-transparent" />
-					<button
-						onClick={() => navigate(-1)}
-						className="absolute top-24 left-8 text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm transition-colors"
-					>
-						← Back
-					</button>
 				</div>
 			)}
 
@@ -99,32 +100,35 @@ const TitleDetailPage = () => {
 							{title.overview}
 						</p>
 
-						{trailer && (
-							<>
+						<div className="mt-6 flex flex-wrap gap-3">
+							{trailer && (
 								<a
 									href={`https://www.youtube.com/watch?v=${trailer.key}`}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="mt-6 inline-flex items-center gap-2 bg-accent text-primary font-semibold px-6 py-3 rounded-full w-fit hover:bg-accent/80 transition-colors"
+									className="inline-flex items-center gap-2 bg-accent text-primary font-semibold px-6 py-3 rounded-full hover:bg-accent/80 transition-colors"
 								>
 									▶ Watch Trailer
 								</a>
-								<button
-									onClick={() =>
-										toggle({
-											media_type: type,
-											title: name,
-											poster_path: title.poster_path,
-											vote_average: title.vote_average,
-										})
-									}
-									disabled={loading}
-									className={`mt-6 inline-flex items-center gap-2 font-semibold px-6 py-3 rounded-full w-fit transition-colors ${saved ? "bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/30" : "bg-white/10 text-white border border-white/10 hover:bg-white/20"}`}
-								>
-									{saved ? "✓ Saved" : "+Watchlist"}
-								</button>
-							</>
-						)}
+							)}
+							<button
+								onClick={() =>
+									toggle({
+										media_type: type,
+										title: name,
+										poster_path: title.poster_path,
+										vote_average: title.vote_average ?? 0,
+									})
+								}
+								disabled={loading}
+								aria-label={
+									saved ? "Remove from watchlist" : "Add to watchlist"
+								}
+								className={`inline-flex items-center gap-2 font-semibold px-6 py-3 rounded-full transition-colors ${saved ? "bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/30" : "bg-white/10 text-white border border-white/10 hover:bg-white/20"}`}
+							>
+								{saved ? "✓ Saved" : "+ Watchlist"}
+							</button>
+						</div>
 					</div>
 				</div>
 

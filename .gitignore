@@ -30,8 +30,3 @@ packages/*/dist/
 *.njsproj
 *.sln
 *.sw?
-.env
-apps/*/dist/
-packages/*/dist/
-*.tsbuildinfo
-.pnpm-store/
