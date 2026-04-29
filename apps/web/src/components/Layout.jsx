@@ -1,5 +1,29 @@
 import { Outlet, Link, NavLink } from "react-router-dom";
-import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
+import { useAuth } from '../context/AuthContext';
+
+const NavbarAuth = () => {
+    const { user, signOut } = useAuth();
+    if (user) {
+        return (
+            <div className="flex items-center gap-3">
+                <img
+                    src={user.user_metadata?.avatar_url ?? `https://ui-avatars.com/api/?name=${user.email}&background=38bdf8&color=020617`}
+                    alt="avatar"
+                    className="w-8 h-8 rounded-full object-cover border-2 border-accent/50"
+                />
+                <button onClick={signOut} className="text-sm text-gray-300 hover:text-white transition-colors">
+                    Sign Out
+                </button>
+            </div>
+        );
+    }
+    return (
+        <div className="flex items-center gap-3">
+            <Link to="/login" className="text-sm text-gray-300 hover:text-white transition-colors">Sign In</Link>
+            <Link to="/signup" className="text-sm bg-accent text-primary font-semibold px-4 py-2 rounded-full hover:bg-accent/80 transition-colors">Get Started</Link>
+        </div>
+    );
+};
 
 const Layout = () => {
     return (
@@ -16,15 +40,7 @@ const Layout = () => {
                     <NavLink to="/search" className={({ isActive }) => isActive ? "text-white" : "hover:text-white transition-colors"}>Search</NavLink>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <SignedOut>
-                        <Link to="/login" className="text-sm text-gray-300 hover:text-white transition-colors">Sign In</Link>
-                        <Link to="/signup" className="text-sm bg-accent text-primary font-semibold px-4 py-2 rounded-full hover:bg-accent/80 transition-colors">Get Started</Link>
-                    </SignedOut>
-                    <SignedIn>
-                        <UserButton afterSignOutUrl="/" />
-                    </SignedIn>
-                </div>
+                <NavbarAuth />
             </nav>
 
             <main className="flex-1">
