@@ -1,7 +1,5 @@
-import { AuthenticateWithRedirectCallback } from '@clerk/clerk-react';
+import { Navigate } from "react-router-dom";
 
-const SSOCallbackPage = () => {
-  return <AuthenticateWithRedirectCallback />;
-};
+const SSOCallbackPage = () => <Navigate to="/" replace />;
 
 export default SSOCallbackPage;
