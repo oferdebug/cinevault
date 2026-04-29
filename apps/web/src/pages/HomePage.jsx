@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import api from '../lib/axios';
 
 const fetchTrending = async () => {
@@ -7,12 +8,39 @@ const fetchTrending = async () => {
   return data.data;
 };
 
+const fetchSearch = async (query) => {
+  const { data } = await api.get(`/catalog/search?q=${encodeURIComponent(query)}`);
+  return data.data;
+};
+
 export const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const { data: movies, isLoading, isError } = useQuery({
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQuery(searchQuery), 400);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+
+  const isSearching = debouncedQuery.trim().length > 1;
+
+  const { data: trending, isLoading: trendingLoading, isError: trendingError } = useQuery({
     queryKey: ['trending'],
     queryFn: fetchTrending,
+    enabled: !isSearching,
   });
+
+  const { data: searchResults, isLoading: searchLoading, isError: searchError } = useQuery({
+    queryKey: ['search', debouncedQuery],
+    queryFn: () => fetchSearch(debouncedQuery),
+    enabled: isSearching,
+  });
+
+  const movies = isSearching ? searchResults : trending;
+  const isLoading = isSearching ? searchLoading : trendingLoading;
+  const isError = isSearching ? searchError : trendingError;
+  const sectionTitle = isSearching ? `Results for "${debouncedQuery}"` : 'Trending This Week';
 
   return (
     <main className={'pattern'}>
@@ -41,7 +69,7 @@ export const HomePage = () => {
         </div>
 
         <section className="mt-16">
-          <h2 className="mb-6">Trending This Week</h2>
+          <h2 className="mb-6">{sectionTitle}</h2>
 
           {isLoading && (
             <p className="text-gray-100 text-center py-10">Loading movies…</p>
@@ -55,7 +83,7 @@ export const HomePage = () => {
             <div className="all-movies">
               <ul>
                 {movies.map((movie) => (
-                  <li key={movie.id} className="movie-card cursor-pointer">
+                  <li key={movie.id} className="movie-card cursor-pointer" onClick={() => navigate(`/title/${movie.id}?type=${movie.media_type ?? 'movie'}`)}>
                     <img
                       src={movie.poster_path
                         ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
