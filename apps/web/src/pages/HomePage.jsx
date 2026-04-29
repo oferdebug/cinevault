@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import api from '../lib/axios';
+import MovieCardSkeleton from '../components/MovieCardSkeleton';
 
 const fetchTrending = async () => {
   const { data } = await api.get('/catalog/trending');
@@ -72,7 +73,13 @@ export const HomePage = () => {
           <h2 className="mb-6">{sectionTitle}</h2>
 
           {isLoading && (
-            <p className="text-gray-100 text-center py-10">Loading movies…</p>
+            <div className="all-movies">
+              <ul>
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <MovieCardSkeleton key={i} />
+                ))}
+              </ul>
+            </div>
           )}
 
           {isError && (

@@ -1,4 +1,5 @@
 import { Outlet, Link, NavLink } from "react-router-dom";
+import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 
 const Layout = () => {
     return (
@@ -16,8 +17,13 @@ const Layout = () => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <Link to="/login" className="text-sm text-gray-300 hover:text-white transition-colors">Sign In</Link>
-                    <Link to="/signup" className="text-sm bg-accent text-primary font-semibold px-4 py-2 rounded-full hover:bg-accent/80 transition-colors">Get Started</Link>
+                    <SignedOut>
+                        <Link to="/login" className="text-sm text-gray-300 hover:text-white transition-colors">Sign In</Link>
+                        <Link to="/signup" className="text-sm bg-accent text-primary font-semibold px-4 py-2 rounded-full hover:bg-accent/80 transition-colors">Get Started</Link>
+                    </SignedOut>
+                    <SignedIn>
+                        <UserButton afterSignOutUrl="/" />
+                    </SignedIn>
                 </div>
             </nav>
 
@@ -25,9 +31,28 @@ const Layout = () => {
                 <Outlet />
             </main>
 
-            <footer className="px-8 py-6 text-center text-gray-600 text-sm border-t border-gray-900">
+            <footer className="px-8 py-6 text-center text-gray-600 text-sm border-t border-gray-900 hidden md:block">
                 &copy; 2025 CineVault. All rights reserved.
             </footer>
+
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around px-4 py-3 bg-primary/95 backdrop-blur-md border-t border-gray-800">
+                <NavLink to="/" className={({ isActive }) => `flex flex-col items-center gap-1 text-xs ${isActive ? 'text-accent' : 'text-gray-400'}`}>
+                    <span className="text-lg">🏠</span>
+                    <span>Home</span>
+                </NavLink>
+                <NavLink to="/browse" className={({ isActive }) => `flex flex-col items-center gap-1 text-xs ${isActive ? 'text-accent' : 'text-gray-400'}`}>
+                    <span className="text-lg">🎬</span>
+                    <span>Browse</span>
+                </NavLink>
+                <NavLink to="/search" className={({ isActive }) => `flex flex-col items-center gap-1 text-xs ${isActive ? 'text-accent' : 'text-gray-400'}`}>
+                    <span className="text-lg">🔍</span>
+                    <span>Search</span>
+                </NavLink>
+                <NavLink to="/login" className={({ isActive }) => `flex flex-col items-center gap-1 text-xs ${isActive ? 'text-accent' : 'text-gray-400'}`}>
+                    <span className="text-lg">👤</span>
+                    <span>Sign In</span>
+                </NavLink>
+            </nav>
         </div>
     );
 };

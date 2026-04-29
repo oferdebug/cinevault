@@ -8,6 +8,7 @@ import WatchPage from "./pages/WatchPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import SSOCallbackPage from "./pages/SSOCallbackPage";
 
 const App = () => {
 	return (
@@ -21,6 +22,7 @@ const App = () => {
 					<Route path="/watch/:id" element={<WatchPage />} />
 					<Route path="/login" element={<LoginPage />} />
 					<Route path="/signup" element={<SignupPage />} />
+					<Route path="/sso-callback" element={<SSOCallbackPage />} />
 					<Route path="*" element={<NotFoundPage />} />
 				</Route>
 			</Routes>
