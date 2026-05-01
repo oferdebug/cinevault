@@ -1,13 +1,13 @@
-import { useAuth } from './AuthContext';
 import {
 	createContext,
+	useCallback,
 	useContext,
 	useEffect,
-	useState,
-	useCallback,
 	useMemo,
+	useState,
 } from 'react';
 import supabase from '../lib/supabase';
+import { useAuth } from './AuthContext';
 
 const WatchlistContext = createContext({
 	vaultItems: [],

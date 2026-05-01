@@ -49,6 +49,10 @@
 	header img {
 		@apply w-full max-w-lg h-auto object-contain mx-auto drop-shadow-md;
 	}
+
+	:where(a, button, input, select, textarea):focus-visible {
+		@apply outline-none ring-2 ring-accent/80 ring-offset-2 ring-offset-primary;
+	}
 }
 
 @layer components {
@@ -142,6 +146,26 @@
 		& .content .year {
 			@apply text-gray-100 font-medium text-base;
 		}
+	}
+
+	.btn-primary {
+		@apply inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-accent/80 disabled:cursor-not-allowed disabled:opacity-60;
+	}
+
+	.btn-ghost {
+		@apply inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-60;
+	}
+
+	.btn-secondary {
+		@apply inline-flex items-center justify-center gap-2 rounded-full border border-accent/40 px-6 py-3 text-sm font-semibold text-accent transition-colors hover:bg-accent hover:text-primary disabled:cursor-not-allowed disabled:opacity-60;
+	}
+
+	.btn-danger {
+		@apply inline-flex items-center justify-center gap-2 rounded-full border border-red-500/30 bg-red-500/20 px-6 py-3 text-sm font-semibold text-red-400 transition-colors hover:bg-red-500/30 disabled:cursor-not-allowed disabled:opacity-60;
+	}
+
+	.btn-success {
+		@apply inline-flex items-center justify-center gap-2 rounded-full border border-green-500/30 bg-green-500/20 px-6 py-3 text-sm font-semibold text-green-400 transition-colors hover:bg-green-500/30 disabled:cursor-not-allowed disabled:opacity-60;
 	}
 }
 

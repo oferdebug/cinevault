@@ -1,38 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlistContext } from '../context/WatchlistContext';
 import supabase from '../lib/supabase';
 import { getVaultStats } from '../utils/getVaultStats';
+import api from '../lib/axios';
+import MovieCard from '../components/MovieCard';
+
 const VaultPage = () => {
 	const navigate = useNavigate();
 	const { user, loading: authLoading } = useAuth();
 	const { vaultItems, removeFromWatchlist, refresh, loading } =
 		useWatchlistContext();
+
 	const [error, setError] = useState('');
 	const [removingId, setRemovingId] = useState(null);
-
+	const [recommendations, setRecommendations] = useState([]);
 	const vaultStats = getVaultStats(vaultItems);
+	const seedItem = vaultStats.highestRated ?? vaultItems[0];
 	const { averageRating, movieCount, seriesCount } = vaultStats;
 
-	const tasteLevel =
-		averageRating >= 7.5
-			? 'You have high standards'
-			: 'You enjoy casual content';
-
-	const preference =
+	const preferredMediaType =
 		movieCount > seriesCount
-			? 'You prefer movies'
-			: movieCount < seriesCount
-				? 'You prefer series'
-				: 'You enjoy both equally';
+			? 'movie'
+			: seriesCount > movieCount
+				? 'tv'
+				: 'mixed';
 
-	const behavior =
-		seriesCount > movieCount
-			? 'You binge series'
+	const tasteSummary =
+		movieCount > seriesCount && averageRating >= 7.5
+			? 'Your vault leans toward movies, with a preference for highly rated titles.'
 			: movieCount > seriesCount
-				? 'You lean toward movies'
-				: 'Balanced watching habits';
+				? 'Your vault leans toward movies, with a taste for lighter, more casual titles.'
+				: seriesCount > movieCount && averageRating >= 7.5
+					? 'Your vault leans toward series, with a strong preference for high-quality titles.'
+					: seriesCount > movieCount
+						? 'Your vault leans toward series, with a preference for more casual titles.'
+						: averageRating >= 7.5
+							? 'You watch a balanced mix of movies and series, with a strong preference for high-quality content.'
+							: 'You watch a balanced mix of movies and series, with a preference for casual content.';
+
+	const recommendationTitle =
+		preferredMediaType === 'movie'
+			? 'Because you prefer movies'
+			: preferredMediaType === 'tv'
+				? 'Because you prefer series'
+				: 'Because you enjoy both';
+
+	const recommendationDescription =
+		preferredMediaType === 'movie'
+			? 'Here are movie picks that match your vault behavior.'
+			: preferredMediaType === 'tv'
+				? 'Here are series picks that match your vault behavior.'
+				: 'Here are mixed picks based on your balanced taste.';
+
 	const handleRemove = async (item) => {
 		setRemovingId(item.id);
 		setError('');
@@ -53,6 +74,20 @@ const VaultPage = () => {
 		setRemovingId(null);
 	};
 
+	useEffect(() => {
+		if (!seedItem) return;
+
+		const fetchRecommendations = async () => {
+			const { data } = await api.get(
+				`/catalog/similar/${seedItem.tmdb_id}?type=${seedItem.media_type ?? 'movie'}`,
+			);
+
+			setRecommendations(data.data ?? []);
+		};
+
+		fetchRecommendations();
+	}, [seedItem]);
+
 	if (authLoading || loading) {
 		return (
 			<main className="min-h-screen bg-primary px-8 pt-28 pb-20">
@@ -70,13 +105,16 @@ const VaultPage = () => {
 					<p className="text-sm font-bold uppercase tracking-[0.24em] text-accent">
 						My Vault
 					</p>
+
 					<h1 className="mt-4 text-4xl font-bold text-light-100">
 						Sign in to open your vault.
 					</h1>
+
 					<p className="mx-auto mt-4 max-w-xl text-light-200">
 						Save movies and shows, then come back to your personal CineVault
 						anytime.
 					</p>
+
 					<button
 						type="button"
 						onClick={() => navigate('/login')}
@@ -93,65 +131,104 @@ const VaultPage = () => {
 		<main className="min-h-screen bg-primary px-8 pt-28 pb-20">
 			<section className="mx-auto max-w-6xl">
 				<div className="mb-8">
-					<p className="mt-2 text-2xl font-bold text-light-100">
-						{movieCount > seriesCount && averageRating >= 7.5
-							? 'Your vault leans toward movies, with a preference for highly rated titles.'
-							: movieCount > seriesCount
-								? 'Your vault leans toward movies, with a taste for lighter, more casual titles.'
-								: seriesCount > movieCount && averageRating >= 7.5
-									? 'Your vault leans toward series, with a strong preference for high-quality titles.'
-									: seriesCount > movieCount
-										? 'Your vault leans toward series, with a preference for more casual titles.'
-										: averageRating >= 7.5
-											? 'You watch a balanced mix of movies and series, with a strong preference for high-quality content.'
-											: 'You watch a balanced mix of movies and series, with a preference for casual content.'}
+					<p className="text-sm font-bold uppercase tracking-[0.24em] text-accent">
+						My Vault
 					</p>
-					<div className="mt-8">
-						<p className="text-sm text-light-200">Your Taste Profile</p>
-						<p className="mt-2 text-xl font-bold text-light-100">
-							{tasteLevel}
-						</p>
-						<p className="mt-1 text-light-200">{preference}</p>
-						<p className="mt-1 text-light-200">{behavior}</p>
-					</div>
+
+					<h1 className="mt-3 text-left text-4xl font-bold text-light-100">
+						Your saved titles
+					</h1>
+
+					<p className="mt-3 max-w-2xl text-light-200">
+						Everything you saved from CineVault, ready when you are.
+					</p>
+
 					{vaultItems.length > 0 && (
-						<div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-							<div className="rounded-2xl border border-light-100/10 bg-dark-100/70 p-5">
-								<p className="text-sm text-light-200">Total Titles</p>
-								<p className="mt-2 text-3xl font-bold text-light-100">
-									{vaultStats.totalTitles}
+						<>
+							<div className="mt-8 rounded-3xl border border-accent/20 bg-dark-100/70 p-6">
+								<p className="text-xs uppercase tracking-widest text-accent">
+									Your Taste Profile
+								</p>
+
+								<p className="mt-3 text-2xl font-bold text-light-100">
+									{tasteSummary}
 								</p>
 							</div>
 
-							<div className="rounded-2xl border border-light-100/10 bg-dark-100/70 p-5">
-								<p className="text-sm text-light-200">Movies vs Series</p>
-								<p className="mt-2 text-3xl font-bold text-light-100">
-									{vaultStats.movieCount} / {vaultStats.seriesCount}
-								</p>
+							<div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+								<div className="rounded-2xl border border-light-100/10 bg-dark-100/70 p-5">
+									<p className="text-sm text-light-200">Total Titles</p>
+									<p className="mt-2 text-3xl font-bold text-light-100">
+										{vaultStats.totalTitles}
+									</p>
+								</div>
+
+								<div className="rounded-2xl border border-light-100/10 bg-dark-100/70 p-5">
+									<p className="text-sm text-light-200">Movies vs Series</p>
+									<p className="mt-2 text-3xl font-bold text-light-100">
+										{vaultStats.movieCount} / {vaultStats.seriesCount}
+									</p>
+								</div>
+
+								<div className="rounded-2xl border border-light-100/10 bg-dark-100/70 p-5">
+									<p className="text-sm text-light-200">Average Rating</p>
+									<p className="mt-2 text-3xl font-bold text-light-100">
+										{vaultStats.averageRating.toFixed(1)}
+									</p>
+								</div>
+
+								<div className="rounded-2xl border border-accent/20 bg-dark-100/70 p-5">
+									<p className="text-sm text-light-200">Highest Rated</p>
+									<p className="mt-2 line-clamp-1 text-xl font-bold text-light-100">
+										{vaultStats.highestRated?.title ?? 'None'}
+									</p>
+									<p className="mt-1 text-sm text-accent">
+										⭐{' '}
+										{Number(vaultStats.highestRated?.vote_average ?? 0).toFixed(
+											1,
+										)}
+									</p>
+								</div>
 							</div>
 
-							<div className="rounded-2xl border border-light-100/10 bg-dark-100/70 p-5">
-								<p className="text-sm text-light-200">
-									You tend to watch above-average content
+							<div className="mt-12 rounded-3xl border border-accent/20 bg-dark-100/70 p-6">
+								<p className="text-xs uppercase tracking-widest text-accent">
+									Recommendations
 								</p>
-								<p className="mt-2 text-3xl font-bold text-light-100">
-									{vaultStats.averageRating.toFixed(1)}
-								</p>
-							</div>
 
-							<div className="rounded-2xl border border-accent/20 bg-dark-100/70 p-5">
-								<p className="text-sm text-light-200">Highest Rated</p>
-								<p className="mt-2 line-clamp-1 text-xl font-bold text-light-100">
-									{vaultStats.highestRated?.title ?? 'None'}
+								<h2 className="mt-3 text-2xl font-bold text-light-100">
+									{recommendationTitle}
+								</h2>
+
+								<p className="mt-2 text-light-200">
+									{recommendationDescription}
 								</p>
-								<p className="mt-1 text-sm text-accent">
-									⭐{' '}
-									{Number(vaultStats.highestRated?.vote_average ?? 0).toFixed(
-										1,
-									)}
-								</p>
+
+								{seedItem && (
+									<button
+										type="button"
+										className="mt-4 rounded-full bg-accent px-5 py-2 text-sm font-bold text-primary transition hover:bg-accent/80"
+										onClick={() =>
+											navigate(
+												`/title/${seedItem.tmdb_id}?type=${seedItem.media_type ?? 'movie'}`,
+											)
+										}
+									>
+										View Similar Titles
+									</button>
+								)}
+
+								{recommendations.length > 0 && (
+									<div className="mt-6 all-movies">
+										<ul>
+											{recommendations.slice(0, 6).map((movie) => (
+												<MovieCard key={movie.id} movie={movie} />
+											))}
+										</ul>
+									</div>
+								)}
 							</div>
-						</div>
+						</>
 					)}
 				</div>
 
@@ -162,9 +239,11 @@ const VaultPage = () => {
 						<h2 className="text-2xl font-bold text-light-100">
 							Your vault is empty.
 						</h2>
+
 						<p className="mt-3 text-light-200">
 							Start saving titles from the home page or title detail pages.
 						</p>
+
 						<button
 							type="button"
 							onClick={() => navigate('/')}
@@ -206,13 +285,17 @@ const VaultPage = () => {
 											}
 										>
 											<img src={posterSrc} alt={item.title} />
+
 											<h3>{item.title}</h3>
+
 											<div className="content">
 												<div className="rating">
 													<span>⭐</span>
 													<p>{Number(item.vote_average ?? 0).toFixed(1)}</p>
 												</div>
+
 												<span>•</span>
+
 												<span className="lang">
 													{item.media_type === 'tv' ? 'Series' : 'Movie'}
 												</span>
@@ -228,5 +311,4 @@ const VaultPage = () => {
 		</main>
 	);
 };
-
 export default VaultPage;

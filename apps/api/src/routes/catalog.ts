@@ -176,6 +176,45 @@ router.get("/title/:id", async (req, res) => {
 	}
 });
 
+router.get("/similar/:id", async (req, res) => {
+	try {
+		const { id } = req.params;
+		const rawType = req.query.type as string | undefined;
+
+		if (!/^\d+$/.test(id)) {
+			res.status(400).json({ ok: false, error: "Invalid id; must be numeric" });
+			return;
+		}
+		if (!ALLOWED_MEDIA_TYPES.has(rawType ?? "")) {
+			res
+				.status(400)
+				.json({ ok: false, error: "Invalid type; must be 'movie' or 'tv'" });
+			return;
+		}
+		const mediaType = rawType as string;
+
+		const url = `${TMDB_BASE}/${mediaType}/${id}/similar?api_key=${TMDB_KEY}&language=en-US`;
+		const tmdb = await fetchWithTimeout(url);
+
+		if (!tmdb.ok) {
+			res
+				.status(502)
+				.json({ ok: false, error: "TMDB fetch failed", status: tmdb.status });
+			return;
+		}
+
+		const data = (await tmdb.json()) as { results: unknown[] };
+		res.json({ ok: true, data: data.results });
+	} catch (err) {
+		const isTimeout = err instanceof Error && err.name === "AbortError";
+		logger.error({ err }, "similar fetch error");
+		res.status(isTimeout ? 504 : 500).json({
+			ok: false,
+			error: isTimeout ? "Request to TMDB timed out" : String(err),
+		});
+	}
+});
+
 router.get("/trending", async (_req, res) => {
 	try {
 		const url = `${TMDB_BASE}/trending/all/week?api_key=${TMDB_KEY}&language=en-US`;
