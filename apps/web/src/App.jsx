@@ -1,15 +1,16 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { lazy, Suspense } from "react";
-import Layout from "./components/Layout";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import Layout from './components/Layout';
 
-const HomePage = lazy(() => import("./pages/HomePage"));
-const BrowsePage = lazy(() => import("./pages/BrowsePage"));
-const SearchPage = lazy(() => import("./pages/SearchPage"));
-const TitleDetailPage = lazy(() => import("./pages/TitleDetailPage"));
-const WatchPage = lazy(() => import("./pages/WatchPage"));
-const LoginPage = lazy(() => import("./pages/LoginPage"));
-const SignupPage = lazy(() => import("./pages/SignupPage"));
-const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
+const HomePage = lazy(() => import('./pages/HomePage'));
+const BrowsePage = lazy(() => import('./pages/BrowsePage'));
+const SearchPage = lazy(() => import('./pages/SearchPage'));
+const TitleDetailPage = lazy(() => import('./pages/TitleDetailPage'));
+const WatchPage = lazy(() => import('./pages/WatchPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const SignupPage = lazy(() => import('./pages/SignupPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+const VaultPage = lazy(() => import('./pages/VaultPage'));
 
 const App = () => {
 	return (
@@ -20,6 +21,7 @@ const App = () => {
 						<Route index element={<HomePage />} />
 						<Route path="/browse" element={<BrowsePage />} />
 						<Route path="/search" element={<SearchPage />} />
+						<Route path="/vault" element={<VaultPage />} />
 						<Route path="/title/:id" element={<TitleDetailPage />} />
 						<Route path="/watch/:id" element={<WatchPage />} />
 						<Route path="/login" element={<LoginPage />} />

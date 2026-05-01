@@ -15,6 +15,7 @@ const NavbarAuth = () => {
 					className="w-8 h-8 rounded-full object-cover border-2 border-accent/50"
 				/>
 				<button
+					type="button"
 					onClick={signOut}
 					className="text-sm text-gray-300 hover:text-white transition-colors"
 				>
@@ -123,8 +124,20 @@ const Layout = () => {
 					<span className="text-lg">🔍</span>
 					<span>Search</span>
 				</NavLink>
+				<NavLink
+					to="/vault"
+					className={({ isActive }) =>
+						`flex flex-col items-center gap-1 text-xs ${
+							isActive ? "text-accent" : "text-gray-400"
+						}`
+					}
+				>
+					<span className="text-lg">🔐</span>
+					<span>Vault</span>
+				</NavLink>
 				{user ? (
 					<button
+						type="button"
 						onClick={signOut}
 						className="flex flex-col items-center gap-1 text-xs text-gray-400"
 					>
