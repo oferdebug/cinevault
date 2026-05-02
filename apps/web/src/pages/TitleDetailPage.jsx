@@ -4,6 +4,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import MovieCard from '../components/MovieCard';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlistContext } from '../context/WatchlistContext';
+import { useUserRating } from '../hooks/useUserRating';
 import api from '../lib/axios';
 import supabase from '../lib/supabase';
 
@@ -43,6 +44,12 @@ const TitleDetailPage = () => {
 	});
 
 	const saved = isInWatchlist(Number(id));
+	const {
+		rating,
+		loading: ratingLoading,
+		error: ratingError,
+		saveRating,
+	} = useUserRating(Number(id), type);
 
 	const handleToggle = async () => {
 		if (!user) {
@@ -201,6 +208,25 @@ const TitleDetailPage = () => {
 							>
 								{saved ? '✓ Saved' : '+ Watchlist'}
 							</button>
+							<div className={'w-full mt-4'}>
+								<p clasName={'text-sm text-light-200 mb-2'}>Your Rating</p>
+								<div className={'flex gap-2'}>
+									{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
+										<button
+											key={value}
+											type="button"
+											onClick={() => saveRating(value)}
+											disabled={ratingLoading}
+											className={`px-3 py-2 rounded-full text-sm font-bold transition ${rating === value ? 'bg-accent text-primary' : 'bg-white/10 text-white hover:bg-white/20'}`}
+										>
+											{value}
+										</button>
+									))}
+									{ratingError && (
+										<p className={'text-red-400 text-xs mt-2'}>{ratingError}</p>
+									)}
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -238,7 +264,10 @@ const TitleDetailPage = () => {
 						<div className="all-movies">
 							<ul>
 								{similarTitles.map((item) => (
-									<MovieCard key={`${item.media_type}-${item.id}`} movie={item} />
+									<MovieCard
+										key={`${item.media_type}-${item.id}`}
+										movie={item}
+									/>
 								))}
 							</ul>
 						</div>
