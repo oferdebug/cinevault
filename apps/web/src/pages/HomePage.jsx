@@ -106,10 +106,10 @@ export const HomePage = () => {
 			/>
 			<div className={'wrapper pt-28'}>
 				<header>
-					<img
+					{/* <img
 						src="/src/assets/cinevault-logo-transparent.svg"
 						alt="CineVault"
-					/>
+					/> */}
 					<h1>
 						Stop Scrolling <span className="text-gradient">Tonight</span>
 						<br /> Unlock Your Next Watch.

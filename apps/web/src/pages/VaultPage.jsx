@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import MovieCard from '../components/MovieCard';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlistContext } from '../context/WatchlistContext';
-import supabase from '../lib/supabase';
-import { getVaultStats } from '../utils/getVaultStats';
 import api from '../lib/axios';
-import MovieCard from '../components/MovieCard';
+import supabase from '../lib/supabase';
+import { getRecommendationSeeds } from '../utils/getRecommendationSeeds';
+import { getVaultStats } from '../utils/getVaultStats';
 
 const VaultPage = () => {
 	const navigate = useNavigate();
@@ -16,16 +17,17 @@ const VaultPage = () => {
 	const [error, setError] = useState('');
 	const [removingId, setRemovingId] = useState(null);
 	const [recommendations, setRecommendations] = useState([]);
-	const vaultStats = getVaultStats(vaultItems);
-	const seedItem = vaultStats.highestRated ?? vaultItems[0];
-	const { averageRating, movieCount, seriesCount } = vaultStats;
 
-	const preferredMediaType =
-		movieCount > seriesCount
-			? 'movie'
-			: seriesCount > movieCount
-				? 'tv'
-				: 'mixed';
+	const vaultStats = useMemo(() => getVaultStats(vaultItems), [vaultItems]);
+
+	const seedItems = useMemo(
+		() => getRecommendationSeeds(vaultItems, vaultStats),
+		[vaultItems, vaultStats],
+	);
+
+	const mainSeed = seedItems[0];
+	const seedTitle = mainSeed?.title ?? mainSeed?.name;
+	const { averageRating, movieCount, seriesCount } = vaultStats;
 
 	const tasteSummary =
 		movieCount > seriesCount && averageRating >= 7.5
@@ -40,19 +42,13 @@ const VaultPage = () => {
 							? 'You watch a balanced mix of movies and series, with a strong preference for high-quality content.'
 							: 'You watch a balanced mix of movies and series, with a preference for casual content.';
 
-	const recommendationTitle =
-		preferredMediaType === 'movie'
-			? 'Because you prefer movies'
-			: preferredMediaType === 'tv'
-				? 'Because you prefer series'
-				: 'Because you enjoy both';
+	const recommendationTitle = seedTitle
+		? `Because you liked ${seedTitle}`
+		: 'Recommendations for you';
 
-	const recommendationDescription =
-		preferredMediaType === 'movie'
-			? 'Here are movie picks that match your vault behavior.'
-			: preferredMediaType === 'tv'
-				? 'Here are series picks that match your vault behavior.'
-				: 'Here are mixed picks based on your balanced taste.';
+	const recommendationDescription = seedTitle
+		? `Here are picks similar to ${seedTitle}.`
+		: 'Here are movie and series picks that match your vault behavior.';
 
 	const handleRemove = async (item) => {
 		setRemovingId(item.id);
@@ -75,18 +71,55 @@ const VaultPage = () => {
 	};
 
 	useEffect(() => {
-		if (!seedItem) return;
+		if (!seedItems.length) {
+			setRecommendations([]);
+			return;
+		}
+
+		let ignore = false;
 
 		const fetchRecommendations = async () => {
-			const { data } = await api.get(
-				`/catalog/similar/${seedItem.tmdb_id}?type=${seedItem.media_type ?? 'movie'}`,
-			);
+			try {
+				const responses = await Promise.all(
+					seedItems.map((seed) =>
+						api.get(
+							`/catalog/similar/${seed.tmdb_id}?type=${seed.media_type ?? 'movie'}`,
+						),
+					),
+				);
 
-			setRecommendations(data.data ?? []);
+				if (ignore) return;
+
+				const merged = responses.flatMap((response, index) => {
+					const seed = seedItems[index];
+
+					return (response.data.data ?? []).map((item) => ({
+						...item,
+						media_type: seed.media_type ?? 'movie',
+					}));
+				});
+
+				const uniqueRecommendations = merged.filter(
+					(movie, index, array) =>
+						array.findIndex(
+							(item) =>
+								item.id === movie.id && item.media_type === movie.media_type,
+						) === index,
+				);
+
+				setRecommendations(uniqueRecommendations.slice(0, 6));
+			} catch (err) {
+				console.error('Failed to fetch recommendations', err);
+				setRecommendations([]);
+			}
 		};
 
 		fetchRecommendations();
-	}, [seedItem]);
+
+		return () => {
+			ignore = true;
+		};
+	}, [seedItems]);
 
 	if (authLoading || loading) {
 		return (
@@ -204,13 +237,13 @@ const VaultPage = () => {
 									{recommendationDescription}
 								</p>
 
-								{seedItem && (
+								{mainSeed && (
 									<button
 										type="button"
 										className="mt-4 rounded-full bg-accent px-5 py-2 text-sm font-bold text-primary transition hover:bg-accent/80"
 										onClick={() =>
 											navigate(
-												`/title/${seedItem.tmdb_id}?type=${seedItem.media_type ?? 'movie'}`,
+												`/title/${mainSeed.tmdb_id}?type=${mainSeed.media_type ?? 'movie'}`,
 											)
 										}
 									>
@@ -221,8 +254,11 @@ const VaultPage = () => {
 								{recommendations.length > 0 && (
 									<div className="mt-6 all-movies">
 										<ul>
-											{recommendations.slice(0, 6).map((movie) => (
-												<MovieCard key={movie.id} movie={movie} />
+											{recommendations.map((movie) => (
+												<MovieCard
+													key={`${movie.media_type}-${movie.id}`}
+													movie={movie}
+												/>
 											))}
 										</ul>
 									</div>
@@ -311,4 +347,5 @@ const VaultPage = () => {
 		</main>
 	);
 };
+
 export default VaultPage;
