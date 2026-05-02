@@ -1,9 +1,7 @@
-import { getVaultStats } from './getVaultStats';
+import { getVaultStats } from "./getVaultStats";
 
 export const getRecommendationSeeds = (items = [], stats) => {
 	if (!items.length) return [];
-
-	const highestRated = stats?.highestRated ?? getVaultStats(items).highestRated;
 
 	const newestItem =
 		[...items].sort(
@@ -13,12 +11,26 @@ export const getRecommendationSeeds = (items = [], stats) => {
 		)[0] ?? null;
 
 	const total = items.length;
-	const movieCount = items.filter((item) => item.media_type === 'movie').length;
-	const seriesCount = items.filter((item) => item.media_type === 'tv').length;
+	const movieCount = items.filter((item) => item.media_type === "movie").length;
+	const seriesCount = items.filter((item) => item.media_type === "tv").length;
 	const dominantRatio = Math.max(movieCount, seriesCount) / total;
 
 	let differentTypeItem = null;
 
+	const ratedItems = items.filter((item) => item.userRating != null);
+	const highestUserRated = ratedItems.reduce((bestItem, currentItem) => {
+		if (!bestItem) return currentItem;
+
+		const bestRating = Number(bestItem.userRating ?? 0);
+		const currentRating = Number(currentItem.userRating ?? 0);
+
+		return currentRating > bestRating ? currentItem : bestItem;
+	}, null);
+
+	const highestRated =
+		highestUserRated ??
+		stats?.highestRated ??
+		getVaultStats(items).highestRated;
 	if (dominantRatio < 0.8) {
 		differentTypeItem = items.find(
 			(item) => highestRated && item.media_type !== highestRated.media_type,

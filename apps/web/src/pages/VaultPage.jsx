@@ -7,22 +7,36 @@ import api from '../lib/axios';
 import supabase from '../lib/supabase';
 import { getRecommendationSeeds } from '../utils/getRecommendationSeeds';
 import { getVaultStats } from '../utils/getVaultStats';
-
+import { useUserRatings } from '../hooks/useUserRatings';
 const VaultPage = () => {
 	const navigate = useNavigate();
 	const { user, loading: authLoading } = useAuth();
 	const { vaultItems, removeFromWatchlist, refresh, loading } =
 		useWatchlistContext();
-
+	const { ratings } = useUserRatings();
 	const [error, setError] = useState('');
 	const [removingId, setRemovingId] = useState(null);
 	const [recommendations, setRecommendations] = useState([]);
 
 	const vaultStats = useMemo(() => getVaultStats(vaultItems), [vaultItems]);
 
+	const enrichedItems = useMemo(() => {
+		return vaultItems.map((item) => {
+			const userRating = ratings.find(
+				(rating) =>
+					item.tmdb_id === rating.tmdb_id &&
+					item.media_type === rating.media_type,
+			);
+
+			return {
+				...item,
+				userRating: userRating?.rating ?? null,
+			};
+		});
+	}, [vaultItems, ratings]);
 	const seedItems = useMemo(
-		() => getRecommendationSeeds(vaultItems, vaultStats),
-		[vaultItems, vaultStats],
+		() => getRecommendationSeeds(enrichedItems, vaultStats),
+		[enrichedItems, vaultStats],
 	);
 
 	const mainSeed = seedItems[0];
