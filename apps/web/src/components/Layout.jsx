@@ -52,6 +52,38 @@ const NavbarAuth = () => {
 			>
 				Get Started
 			</Link>
+			<Link
+				to={"/subscribe"}
+				className={
+					"rounded-full bg-accent px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-accent/80"
+				}
+			>
+				Subscribe
+			</Link>
+			<Link
+				to={"/subscribe"}
+				className={
+					"rounded-full bg-accent px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-accent/80"
+				}
+			>
+				Subscribe
+			</Link>
+			<Link
+				to={"/subscribe"}
+				className={
+					"rounded-full bg-accent px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-accent/80"
+				}
+			>
+				Subscribe
+			</Link>
+			<Link
+				to={"/subscribe"}
+				className={
+					"rounded-full bg-accent px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-accent/80"
+				}
+			>
+				Subscribe
+			</Link>
 		</div>
 	);
 };

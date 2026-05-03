@@ -30,3 +30,4 @@ packages/*/dist/
 *.njsproj
 *.sln
 *.sw?
+.claude/
