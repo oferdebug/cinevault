@@ -6,7 +6,9 @@ const navLinkClass = ({ isActive }) =>
 
 const mobileNavLinkClass = ({ isActive }) =>
 	`flex flex-col items-center gap-1 text-xs ${
-		isActive ? "text-accent" : "text-gray-400"
+		
+	
+	isActive ? "text-accent" : "text-gray-400"
 	}`;
 
 const NavbarAuth = () => {
