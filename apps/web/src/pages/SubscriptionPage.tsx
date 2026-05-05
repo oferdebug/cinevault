@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../lib/axios';
 import {
@@ -12,9 +12,9 @@ import supabase from '../lib/supabase';
 
 const SubscriptionPage = () => {
 	const navigate = useNavigate();
-	const [interval, setInterval] = useState<BillingInterval>('monthly');
-	const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
-	const [error, setError] = useState<string | null>(null);
+	const [interval, setInterval] = React.useState<BillingInterval>('monthly');
+	const [loadingPlanId, setLoadingPlanId] = React.useState<string | null>(null);
+	const [error, setError] = React.useState<string | null>(null);
 
 	const handleSubscribe = async (plan: Plan) => {
 		console.log('handleSubscribe called for plan:', plan.id);

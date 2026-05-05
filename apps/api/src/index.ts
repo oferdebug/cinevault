@@ -1,8 +1,7 @@
 import { resolve } from 'node:path';
+import cors from 'cors';
 import { config } from 'dotenv';
 import type { ErrorRequestHandler } from 'express';
-
-import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 import pino from 'pino';
