@@ -1,26 +1,23 @@
-import { config } from "dotenv";
-import { resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-import { dirname } from "node:path";
-import type { ErrorRequestHandler } from "express";
+import { resolve } from 'node:path';
+import { config } from 'dotenv';
+import type { ErrorRequestHandler } from 'express';
 
-config({ path: resolve(process.cwd(), ".env") });
+import cors from 'cors';
+import express from 'express';
+import helmet from 'helmet';
+import pino from 'pino';
+import billingRouter from './routes/billing.js';
+import catalogRouter from './routes/catalog.js';
 
-import express from "express";
-import cors from "cors";
-import helmet from "helmet";
-import pino from "pino";
-import catalogRouter from "./routes/catalog.js";
+const isDev = process.env.NODE_ENV !== 'production';
 
-const isDev = process.env.NODE_ENV !== "production";
-
-const logger = pino(isDev ? { transport: { target: "pino-pretty" } } : {});
+const logger = pino(isDev ? { transport: { target: 'pino-pretty' } } : {});
 
 const rawPort = Number(process.env.PORT);
 const PORT = Number.isFinite(rawPort) && rawPort > 0 ? rawPort : 4000;
 
-const allowedOrigins = (process.env.CORS_ORIGIN ?? "http://localhost:5173")
-	.split(",")
+const allowedOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
+	.split(',')
 	.map((o) => o.trim());
 
 const app = express();
@@ -35,19 +32,20 @@ app.use(
 		credentials: true,
 	}),
 );
-app.use(express.json({ limit: "100kb" }));
+app.use(express.json({ limit: '100kb' }));
 
-app.use("/catalog", catalogRouter);
+app.use('/catalog', catalogRouter);
+app.use('/billing', billingRouter);
 
-app.get("/health", (_req, res) => {
-	res.json({ ok: true, service: "api", uptime: process.uptime() });
+app.get('/health', (_req, res) => {
+	res.json({ ok: true, service: 'api', uptime: process.uptime() });
 });
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
-	logger.error({ err }, "Unhandled error");
+	logger.error({ err }, 'Unhandled error');
 	res.status(500).json({
 		ok: false,
-		error: isDev ? String(err) : "Internal server error",
+		error: isDev ? String(err) : 'Internal server error',
 	});
 };
 app.use(errorHandler);
@@ -63,13 +61,14 @@ const gracefulShutdown = (signal: string) => {
 	logger.info(`${signal} received, shutting down…`);
 	server.close((err) => {
 		if (err) {
-			logger.error({ err }, "Error during shutdown");
+			logger.error({ err }, 'Error during shutdown');
 			process.exit(1);
 		}
-		logger.info("Server closed");
+		logger.info('Server closed');
 		process.exit(0);
 	});
 };
 
-process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
-process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+config({ path: resolve(process.cwd(), '../../.env') });
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
