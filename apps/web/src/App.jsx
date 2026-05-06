@@ -13,6 +13,7 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const VaultPage = lazy(() => import('./pages/VaultPage'));
 const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
 const CheckoutSuccessPage = lazy(() => import('./pages/CheckoutSuccessPage'));
+const AccountPage = lazy(() => import('./pages/AccountPage'));
 
 const App = () => {
 	return (
@@ -31,6 +32,7 @@ const App = () => {
 						<Route path="*" element={<NotFoundPage />} />
 						<Route path="/subscribe" element={<SubscriptionPage />} />
 						<Route path="/billing/success" element={<CheckoutSuccessPage />} />
+						<Route path="/account" element={<AccountPage />} />
 					</Route>
 				</Routes>
 			</Suspense>

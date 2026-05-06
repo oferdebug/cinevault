@@ -1,14 +1,12 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { Link, NavLink, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const navLinkClass = ({ isActive }) =>
-	isActive ? "text-white" : "hover:text-white transition-colors";
+	isActive ? 'text-white' : 'hover:text-white transition-colors';
 
 const mobileNavLinkClass = ({ isActive }) =>
 	`flex flex-col items-center gap-1 text-xs ${
-		
-	
-	isActive ? "text-accent" : "text-gray-400"
+		isActive ? 'text-accent' : 'text-gray-400'
 	}`;
 
 const NavbarAuth = () => {
@@ -17,16 +15,25 @@ const NavbarAuth = () => {
 	if (user) {
 		return (
 			<div className="flex items-center gap-3">
-				<img
-					src={
-						user.user_metadata?.avatar_url ??
-						`https://ui-avatars.com/api/?name=${encodeURIComponent(
-							user.email ?? "",
-						)}&background=38bdf8&color=020617`
-					}
-					alt="avatar"
-					className="h-8 w-8 rounded-full border-2 border-accent/50 object-cover"
-				/>
+				<Link
+					to="/account"
+					className="text-sm text-gray-300 transition-colors hover:text-white"
+				>
+					Account
+				</Link>
+
+				<Link to="/account" aria-label="Account">
+					<img
+						src={
+							user.user_metadata?.avatar_url ??
+							`https://ui-avatars.com/api/?name=${encodeURIComponent(
+								user.email ?? '',
+							)}&background=38bdf8&color=020617`
+						}
+						alt="avatar"
+						className="h-8 w-8 rounded-full border-2 border-accent/50 object-cover"
+					/>
+				</Link>
 
 				<button
 					type="button"
@@ -53,38 +60,6 @@ const NavbarAuth = () => {
 				className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-accent/80"
 			>
 				Get Started
-			</Link>
-			<Link
-				to={"/subscribe"}
-				className={
-					"rounded-full bg-accent px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-accent/80"
-				}
-			>
-				Subscribe
-			</Link>
-			<Link
-				to={"/subscribe"}
-				className={
-					"rounded-full bg-accent px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-accent/80"
-				}
-			>
-				Subscribe
-			</Link>
-			<Link
-				to={"/subscribe"}
-				className={
-					"rounded-full bg-accent px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-accent/80"
-				}
-			>
-				Subscribe
-			</Link>
-			<Link
-				to={"/subscribe"}
-				className={
-					"rounded-full bg-accent px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-accent/80"
-				}
-			>
-				Subscribe
 			</Link>
 		</div>
 	);
@@ -119,6 +94,10 @@ const Layout = () => {
 					<NavLink to="/vault" className={navLinkClass}>
 						My Vault
 					</NavLink>
+
+					<NavLink to="/subscribe" className={navLinkClass}>
+						Pricing
+					</NavLink>
 				</div>
 
 				<NavbarAuth />
@@ -149,23 +128,19 @@ const Layout = () => {
 				</NavLink>
 
 				{user ? (
-					<button
-						type="button"
-						onClick={signOut}
-						className="flex flex-col items-center gap-1 text-xs text-gray-400"
-					>
+					<NavLink to="/account" className={mobileNavLinkClass}>
 						<img
 							src={
 								user.user_metadata?.avatar_url ??
 								`https://ui-avatars.com/api/?name=${encodeURIComponent(
-									user.email ?? "",
+									user.email ?? '',
 								)}&background=38bdf8&color=020617`
 							}
 							alt="avatar"
 							className="h-6 w-6 rounded-full object-cover"
 						/>
-						<span>Sign Out</span>
-					</button>
+						<span>Account</span>
+					</NavLink>
 				) : (
 					<NavLink to="/login" className={mobileNavLinkClass}>
 						<span className="text-lg">👤</span>

@@ -49,11 +49,13 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
 }
 
 const stripe = new Stripe(STRIPE_SECRET_KEY);
-
-const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+const supabaseAdmin = createClient(
+	SUPABASE_URL as string,
+	SUPABASE_SERVICE_ROLE_KEY as string,
+	{
 	auth: { autoRefreshToken: false, persistSession: false },
-});
-
+	},
+);
 const ALLOWED_PRICE_IDS = new Set([
 	'price_1TTaIICwR3az2cfPcZX3pnQa', // monthly
 	'price_1TTaIICwR3az2cfPe9K8Fwv8', // yearly
@@ -286,5 +288,68 @@ async function upsertSubscription(
 		'subscription upserted',
 	);
 }
+
+router.get('/me', requireAuth, async (req, res) => {
+	const { user } = req as AuthRequest;
+
+	try {
+		const { data, error } = await supabaseAdmin
+			.from('subscriptions')
+			.select('*')
+			.eq('user_id', user.id)
+			.in('status', ['active', 'trialing', 'past_due'])
+			.maybeSingle();
+		if (error) {
+			logger.error({ error, userId: user.id }, 'failed to get subscription');
+			res
+				.status(500)
+				.json({ ok: false, error: { message: 'Failed to get subscription' } });
+			return;
+		}
+		res.json({ ok: true, data: { subscription: data } });
+	} catch (err) {
+		logger.error({ err, userId: user.id }, 'failed to get subscription');
+	}
+});
+
+router.post('/portal', requireAuth, async (req, res) => {
+	const { user } = req as AuthRequest;
+	try {
+		const { data: sub, error } = await supabaseAdmin
+			.from('subscriptions')
+			.select('stripe_customer_id')
+			.eq('user_id', user.id)
+			.order('created_at', { ascending: false })
+			.limit(1)
+			.maybeSingle();
+
+		if (error) {
+			logger.error({ error, userId: user.id }, 'failed to fetch customer id');
+			res
+				.status(500)
+				.json({ ok: false, error: { message: 'Failed to fetch customer' } });
+			return;
+		}
+
+		if (!sub?.stripe_customer_id) {
+			res.status(404).json({
+				ok: false,
+				error: { message: 'No subscription found. Please subscribe first.' },
+			});
+			return;
+		}
+
+		const session = await stripe.billingPortal.sessions.create({
+			customer: sub.stripe_customer_id,
+			return_url: `${APP_URL}/account`,
+		});
+
+		res.json({ ok: true, data: { url: session.url } });
+	} catch (err) {
+		logger.error({ err }, 'portal session creation error');
+		const message = err instanceof Error ? err.message : 'Unknown error';
+		res.status(500).json({ ok: false, error: { message } });
+	}
+});
 
 export default router;
