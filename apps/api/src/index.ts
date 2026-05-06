@@ -31,6 +31,11 @@ app.use(
 		credentials: true,
 	}),
 );
+app.use(
+	'/billing/webhook',
+	express.raw({ type: 'application/json' }),
+	billingRouter,
+);
 app.use(express.json({ limit: '100kb' }));
 
 app.use('/catalog', catalogRouter);
