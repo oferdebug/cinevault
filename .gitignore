@@ -12,14 +12,6 @@ dist
 dist-ssr
 *.local
 
-# Env — real values never committed
-.env
-apps/**/.env
-apps/*/dist/
-packages/*/dist/
-*.tsbuildinfo
-.pnpm-store/
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
