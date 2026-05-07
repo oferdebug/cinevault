@@ -7,6 +7,7 @@ export const useWatchlist = (tmdbId) => {
 	const [saved, setSaved] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const isToggling = useRef(false);
+	const [error, setError] = useState(null);
 
 	const checkSaved = useCallback(async () => {
 		if (!user || !tmdbId) {
@@ -58,6 +59,7 @@ export const useWatchlist = (tmdbId) => {
 
 		isToggling.current = true;
 		setLoading(true);
+		setError(null);
 
 		try {
 			if (saved) {
@@ -66,9 +68,7 @@ export const useWatchlist = (tmdbId) => {
 					.delete()
 					.eq('user_id', user.id)
 					.eq('tmdb_id', tmdbId);
-
 				if (error) throw error;
-
 				setSaved(false);
 			} else {
 				const { error } = await supabase.from('watchlist').insert({
@@ -76,18 +76,23 @@ export const useWatchlist = (tmdbId) => {
 					tmdb_id: tmdbId,
 					...movieData,
 				});
-
-				if (error) throw error;
-
+				if (insertError) throw insertError;
 				setSaved(true);
 			}
 		} catch (err) {
 			console.error('useWatchlist toggle error', err);
+			if (err?.message?.includes('vault limit reached')) {
+				setError(
+					'vault limit reached,please upgrade to a paid plan to add more titles',
+				);
+			} else {
+				setError('generic error,please try again later');
+			}
 		} finally {
 			setLoading(false);
 			isToggling.current = false;
 		}
 	};
 
-	return { saved, loading, toggle };
+	return { saved, loading, toggle, error };
 };
