@@ -15,22 +15,22 @@ const app = express();
 app.use(helmet());
 
 app.use(
-	cors({
-		origin: (origin, cb) => {
-			if (!origin || env.CORS_ORIGINS.includes(origin)) {
-				return cb(null, true);
-			}
+cors({
+origin: (origin, cb) => {
+if (!origin || env.CORS_ORIGINS.includes(origin)) {
+return cb(null, true);
+}
 
-			cb(new Error(`CORS: origin ${origin} not allowed`));
-		},
-		credentials: true,
-	}),
+cb(new Error(`CORS: origin ${origin} not allowed`));
+},
+credentials: true,
+}),
 );
 
 app.use(
-	'/billing/webhook',
-	express.raw({ type: 'application/json' }),
-	billingRouter,
+'/billing/webhook',
+express.raw({ type: 'application/json' }),
+billingRouter,
 );
 
 app.use(express.json({ limit: '100kb' }));
@@ -39,16 +39,16 @@ app.use('/catalog', catalogRouter);
 app.use('/billing', billingRouter);
 
 app.get('/health', (_req, res) => {
-	res.json({ ok: true, service: 'api', uptime: process.uptime() });
+res.json({ ok: true, service: 'api', uptime: process.uptime() });
 });
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
-	logger.error({ err }, 'Unhandled error');
+logger.error({ err }, 'Unhandled error');
 
-	res.status(500).json({
-		ok: false,
-		error: env.isDev ? String(err) : 'Internal server error',
-	});
+res.status(500).json({
+ok: false,
+error: env.isDev ? String(err) : 'Internal server error',
+});
 };
 
 app.use(errorHandler);
@@ -56,24 +56,24 @@ app.use(errorHandler);
 let isShuttingDown = false;
 
 const server = app.listen(env.PORT, () => {
-	logger.info(`API listening on http://localhost:${env.PORT}`);
+logger.info(`API listening on http://localhost:${env.PORT}`);
 });
 
 const gracefulShutdown = (signal: string) => {
-	if (isShuttingDown) return;
+if (isShuttingDown) return;
 
-	isShuttingDown = true;
-	logger.info(`${signal} received, shutting down…`);
+isShuttingDown = true;
+logger.info(`${signal} received, shutting down…`);
 
-	server.close((err) => {
-		if (err) {
-			logger.error({ err }, 'Error during shutdown');
-			process.exit(1);
-		}
+server.close((err) => {
+if (err) {
+logger.error({ err }, 'Error during shutdown');
+process.exit(1);
+}
 
-		logger.info('Server closed');
-		process.exit(0);
-	});
+logger.info('Server closed');
+process.exit(0);
+});
 };
 
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
