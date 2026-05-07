@@ -12,28 +12,32 @@ const SignupPage = lazy(() => import('./pages/SignupPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const VaultPage = lazy(() => import('./pages/VaultPage'));
 const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
+const CheckoutSuccessPage = lazy(() => import('./pages/CheckoutSuccessPage'));
+const AccountPage = lazy(() => import('./pages/AccountPage'));
 
 const App = () => {
-	return (
-		<BrowserRouter>
-			<Suspense fallback={<div className="min-h-screen bg-primary" />}>
-				<Routes>
-					<Route element={<Layout />}>
-						<Route index element={<HomePage />} />
-						<Route path="/browse" element={<BrowsePage />} />
-						<Route path="/search" element={<SearchPage />} />
-						<Route path="/vault" element={<VaultPage />} />
-						<Route path="/title/:id" element={<TitleDetailPage />} />
-						<Route path="/watch/:id" element={<WatchPage />} />
-						<Route path="/login" element={<LoginPage />} />
-						<Route path="/signup" element={<SignupPage />} />
-						<Route path="*" element={<NotFoundPage />} />
-						<Route path="/subscribe" element={<SubscriptionPage />} />
-					</Route>
-				</Routes>
-			</Suspense>
-		</BrowserRouter>
-	);
+return (
+<BrowserRouter>
+<Suspense fallback={<div className="min-h-screen bg-primary" />}>
+<Routes>
+<Route element={<Layout />}>
+<Route index element={<HomePage />} />
+<Route path="/browse" element={<BrowsePage />} />
+<Route path="/search" element={<SearchPage />} />
+<Route path="/vault" element={<VaultPage />} />
+<Route path="/title/:id" element={<TitleDetailPage />} />
+<Route path="/watch/:id" element={<WatchPage />} />
+<Route path="/login" element={<LoginPage />} />
+<Route path="/signup" element={<SignupPage />} />
+<Route path="*" element={<NotFoundPage />} />
+<Route path="/subscribe" element={<SubscriptionPage />} />
+<Route path="/billing/success" element={<CheckoutSuccessPage />} />
+<Route path="/account" element={<AccountPage />} />
+</Route>
+</Routes>
+</Suspense>
+</BrowserRouter>
+);
 };
 
 export default App;

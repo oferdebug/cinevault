@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import MovieCard from '../components/MovieCard';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlistContext } from '../context/WatchlistContext';
+import { useUserRatings } from '../hooks/useUserRatings';
 import api from '../lib/axios';
 import supabase from '../lib/supabase';
 import { getRecommendationSeeds } from '../utils/getRecommendationSeeds';
 import { getVaultStats } from '../utils/getVaultStats';
-import { useUserRatings } from '../hooks/useUserRatings';
+
 const VaultPage = () => {
 	const navigate = useNavigate();
 	const { user, loading: authLoading } = useAuth();
@@ -182,7 +183,7 @@ const VaultPage = () => {
 						My Vault
 					</p>
 
-					<h1 className="mt-3 text-left text-4xl font-bold text-light-100">
+					<h1 className="-ml-2 mt-3 text-left text-4xl font-bold text-light-100">
 						Your saved titles
 					</h1>
 
