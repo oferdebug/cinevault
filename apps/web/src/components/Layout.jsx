@@ -5,9 +5,7 @@ const navLinkClass = ({ isActive }) =>
 	isActive ? "text-white" : "hover:text-white transition-colors";
 
 const mobileNavLinkClass = ({ isActive }) =>
-	`flex flex-col items-center gap-1 text-xs ${
-		isActive ? "text-accent" : "text-gray-400"
-	}`;
+	`flex flex-col items-center gap-1 text-xs ${isActive ? 'text-accent' : 'text-gray-400'}`;
 
 const NavbarAuth = () => {
 	const { user, signOut } = useAuth();
@@ -51,6 +49,12 @@ const NavbarAuth = () => {
 				className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-accent/80"
 			>
 				Get Started
+			</Link>
+			<Link
+				to="/subscribe"
+				className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-accent/80"
+			>
+				Subscribe
 			</Link>
 		</div>
 	);

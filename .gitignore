@@ -22,3 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Env — real values never committed
+.env
+apps/**/.env
+apps/*/dist/
+packages/*/dist/
+*.tsbuildinfo
+.pnpm-store/
+
+.claude/
