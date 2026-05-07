@@ -22,7 +22,7 @@ const getPort = (): number => {
 };
 
 const getCorsOrigins = (): string[] => {
-	const rawOrigins = process.env.CORS_ORIGINS;
+	const rawOrigins = process.env.CORS_ORIGINS ?? process.env.CORS_ORIGIN;
 
 	if (!rawOrigins) {
 		return ['http://localhost:5173', 'http://localhost:3000'];
@@ -39,7 +39,7 @@ export const env = {
 	isDev: (process.env.NODE_ENV ?? 'development') !== 'production',
 	PORT: getPort(),
 	CORS_ORIGINS: getCorsOrigins(),
-	TMDB_BASE_URL: process.env.TMDB_BASE_URL ?? 'https://api.themoviedb.org/3',
+	TMDB_BASE_URL: getRequiredEnv('TMDB_BASE_URL'),
 	TMDB_API_KEY: getRequiredEnv('TMDB_API_KEY'),
 	SUPABASE_URL: getRequiredEnv('SUPABASE_URL'),
 	SUPABASE_ANON_KEY: getRequiredEnv('SUPABASE_ANON_KEY'),
