@@ -11,8 +11,10 @@
 	"scripts": {
 		"lint": "echo 'no lint yet'"
 	},
-	"devDependencies": {
-		"typescript": "^6.0.3",
+	"dependencies": {
 		"zod": "^4.3.6"
+	},
+	"devDependencies": {
+		"typescript": "^6.0.3"
 	}
 }
