@@ -9,6 +9,11 @@ import {
 const SubscriptionPage = () => {
 	const [interval, setInterval] = useState<BillingInterval>('monthly');
 
+	const maxSavingsPct = Math.max(
+		...PLANS.filter((p) => p.monthlyPrice > 0).map(getYearlySavingsPercent),
+		0,
+	);
+
 	return (
 		<main className="min-h-screen bg-primary px-8 pt-28 pb-20">
 			<section className="mx-auto max-w-7xl">
@@ -56,7 +61,7 @@ const SubscriptionPage = () => {
 										: 'bg-accent/20 text-accent'
 								}`}
 							>
-								Save 17%
+								Save {maxSavingsPct}%
 							</span>
 						</button>
 					</div>

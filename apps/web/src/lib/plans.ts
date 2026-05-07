@@ -137,7 +137,7 @@ export const formatPrice=(
 ):string=>{
     if(price===0) return '$0';
     const formatted=price.toFixed(2);
-    return interval==='monthly' ? `$${formatted}`:`$${formatted}`;
+    return interval==='monthly' ? `$${formatted}/mo`:`$${formatted}/yr`;
 };
 
 
@@ -151,6 +151,7 @@ export const getEffectivePrice=(plan:Plan):string=>{
 export const getYearlySavingsPercent=(plan:Plan):number=>{
     if(plan.yearlyPrice===0) return 0;
     const yearlyAtMonthlyRate = plan.monthlyPrice * 12;
+    if(yearlyAtMonthlyRate===0) return 0;
 	const savings = yearlyAtMonthlyRate - plan.yearlyPrice;
     return Math.round((savings/yearlyAtMonthlyRate)*100);
 };
