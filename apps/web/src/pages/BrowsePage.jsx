@@ -35,20 +35,30 @@ const BrowsePage = () => {
 	});
 
 	return (
-		<main className="min-h-screen bg-primary pt-24 pb-16 px-8">
-			<div className="max-w-7xl mx-auto">
-				<h1 className="text-left text-4xl mb-8">Browse</h1>
+		<main className="min-h-screen bg-primary pb-20 px-5 xs:px-8">
+			<div className="max-w-7xl mx-auto pt-8">
+				<div className="mb-8">
+					<p className="text-xs font-semibold uppercase tracking-widest text-accent mb-2">
+						Browse
+					</p>
+					<h1 className="text-left text-4xl sm:text-5xl">Discover Titles</h1>
+					<p className="mt-3 text-light-200/70 text-sm">
+						Pick a genre and explore what's out there.
+					</p>
+				</div>
 
-				<div className="flex gap-3 mb-6">
+				<div className="flex gap-2.5 mb-6">
 					{["movie", "tv"].map((t) => (
 						<button
 							key={t}
+							type="button"
 							onClick={() => setMediaType(t)}
-							className={`px-5 py-2 rounded-full text-sm font-semibold capitalize transition-colors ${
+							className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer ${
 								mediaType === t
-									? "bg-accent text-primary"
-									: "bg-dark-100 text-gray-100 hover:bg-dark-100/60"
+									? "bg-accent text-primary shadow-lg"
+									: "bg-surface-2/80 border border-white/10 text-light-200 hover:border-accent/40 hover:text-light-100"
 							}`}
+							style={mediaType === t ? { boxShadow: '0 4px 16px rgba(99,102,241,0.3)' } : {}}
 						>
 							{t === "tv" ? "TV Shows" : "Movies"}
 						</button>
@@ -60,11 +70,12 @@ const BrowsePage = () => {
 						{genres.map((genre) => (
 							<button
 								key={genre.id}
+								type="button"
 								onClick={() => setSelectedGenre(genre.id)}
-								className={`px-4 py-1.5 rounded-full text-sm transition-colors ${
+								className={`px-4 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer ${
 									selectedGenre === genre.id
 										? "bg-accent text-primary font-semibold"
-										: "bg-dark-100/80 text-gray-100 hover:bg-dark-100 border border-light-100/10"
+										: "bg-surface-2/70 border border-white/8 text-light-200 hover:border-accent/40 hover:text-light-100"
 								}`}
 							>
 								{genre.name}
@@ -74,13 +85,16 @@ const BrowsePage = () => {
 				)}
 
 				{!selectedGenre && (
-					<p className="text-gray-100 text-center py-20">
-						Select a genre to browse titles
-					</p>
+					<div className="flex flex-col items-center justify-center py-24 gap-4">
+						<svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-accent/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+							<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+						</svg>
+						<p className="text-light-200/50 text-sm">Select a genre to browse titles</p>
+					</div>
 				)}
 
 				{isError && (
-					<p role="alert" className="text-red-400 text-center py-10">
+					<p role="alert" className="text-danger/80 text-center py-10">
 						Failed to load titles.
 					</p>
 				)}
@@ -96,7 +110,7 @@ const BrowsePage = () => {
 				)}
 
 				{movies && movies.length === 0 && !isLoading && (
-					<p className="text-gray-100 text-center py-20">
+					<p className="text-light-200/50 text-center py-20 text-sm">
 						No titles found for this genre.
 					</p>
 				)}
@@ -107,7 +121,7 @@ const BrowsePage = () => {
 							{movies.map((movie) => (
 								<li
 									key={movie.id}
-									className="movie-card cursor-pointer"
+									className="movie-card"
 									onClick={() =>
 										navigate(`/title/${movie.id}?type=${mediaType}`)
 									}
@@ -119,20 +133,22 @@ const BrowsePage = () => {
 												: "/src/assets/No-Poster.png"
 										}
 										alt={movie.title ?? movie.name}
+										className="card-poster w-full"
 									/>
-									<h3>{movie.title ?? movie.name}</h3>
-									<div className="content">
-										<div className="rating">
-											<span>⭐</span>
-											<p>{movie.vote_average?.toFixed(1)}</p>
+									<div className="card-inner">
+										<h3>{movie.title ?? movie.name}</h3>
+										<div className="content">
+											<div className="rating">
+												<svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-gold" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+													<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+												</svg>
+												<p>{movie.vote_average?.toFixed(1)}</p>
+											</div>
+											<span>•</span>
+											<span className="year">
+												{(movie.release_date ?? movie.first_air_date ?? "").slice(0, 4)}
+											</span>
 										</div>
-										<span>•</span>
-										<span className="year">
-											{(movie.release_date ?? movie.first_air_date ?? "").slice(
-												0,
-												4,
-											)}
-										</span>
 									</div>
 								</li>
 							))}

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import MovieCard from '../components/MovieCard';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlistContext } from '../context/WatchlistContext';
@@ -63,21 +64,15 @@ const TitleDetailPage = () => {
 
 		try {
 			if (saved) {
-				removeFromWatchlist(Number(id));
-				await supabase
+				const { error } = await supabase
 					.from('watchlist')
 					.delete()
 					.eq('user_id', user.id)
 					.eq('tmdb_id', Number(id));
+				if (error) throw error;
+				removeFromWatchlist(Number(id));
 			} else {
-				addToWatchlist({
-					tmdb_id: Number(id),
-					media_type: type,
-					title: name,
-					poster_path: title.poster_path,
-					vote_average: title.vote_average ?? 0,
-				});
-				await supabase.from('watchlist').insert({
+				const { error } = await supabase.from('watchlist').insert({
 					user_id: user.id,
 					tmdb_id: Number(id),
 					media_type: type,
@@ -85,9 +80,29 @@ const TitleDetailPage = () => {
 					poster_path: title.poster_path,
 					vote_average: title.vote_average ?? 0,
 				});
+				if (error) throw error;
+				addToWatchlist({
+					tmdb_id: Number(id),
+					media_type: type,
+					title: name,
+					poster_path: title.poster_path,
+					vote_average: title.vote_average ?? 0,
+				});
 			}
-		} catch (err) {
-			console.error('TitleDetail toggle error:', err);
+		} catch (error) {
+			console.error('Vault toggle error:', error);
+			if (error?.message?.includes('vault_limit_reached')) {
+				toast.error('Vault full', {
+					description:
+						'Free plan is limited to 20 titles. Upgrade to Plus for unlimited access.',
+					action: {
+						label: 'Upgrade',
+						onClick: () => navigate('/subscribe'),
+					},
+				});
+			} else {
+				toast.error('Something went wrong. Please try again.');
+			}
 		} finally {
 			setToggleLoading(false);
 		}
@@ -95,16 +110,19 @@ const TitleDetailPage = () => {
 
 	if (isLoading) {
 		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<p className="text-gray-100 text-lg">Loading…</p>
+			<div className="min-h-screen flex items-center justify-center bg-primary">
+				<div className="flex flex-col items-center gap-3">
+					<div className="h-8 w-8 rounded-full border-2 border-accent border-t-transparent animate-spin" />
+					<p className="text-light-200/60 text-sm">Loading…</p>
+				</div>
 			</div>
 		);
 	}
 
 	if (isError || !title) {
 		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<p className="text-red-400 text-lg">Failed to load title.</p>
+			<div className="min-h-screen flex items-center justify-center bg-primary">
+				<p className="text-danger/80 text-sm">Failed to load title.</p>
 			</div>
 		);
 	}
@@ -134,62 +152,114 @@ const TitleDetailPage = () => {
 				type="button"
 				onClick={() => navigate(-1)}
 				aria-label="Go back"
-				className="fixed top-24 left-8 z-20 text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm transition-colors"
+				className="fixed top-24 left-5 xs:left-8 z-20 flex items-center gap-2 text-light-200 bg-surface/80 hover:bg-surface border border-white/8 backdrop-blur-md px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer"
+				style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.4)' }}
 			>
-				← Back
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					className="h-4 w-4"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="2"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					aria-hidden="true"
+				>
+					<polyline points="15 18 9 12 15 6" />
+				</svg>
+				Back
 			</button>
 
 			{backdrop && (
-				<div className="relative h-[60vh] w-full overflow-hidden">
+				<div className="relative h-[55vh] w-full overflow-hidden">
 					<img
 						src={backdrop}
 						alt={name}
 						className="w-full h-full object-cover"
 					/>
-					<div className="absolute inset-0 bg-linear-to-t from-primary via-primary/60 to-transparent" />
+					<div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/50 to-primary/10" />
+					<div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent" />
 				</div>
 			)}
 
-			<div className="max-w-6xl mx-auto px-8 -mt-32 relative z-10 pb-16">
-				<div className="flex gap-8 flex-col sm:flex-row">
+			<div className="max-w-6xl mx-auto px-5 xs:px-8 -mt-36 relative z-10 pb-20">
+				<div className="flex gap-6 sm:gap-8 flex-col sm:flex-row">
 					<img
 						src={poster}
 						alt={name}
-						className="w-48 rounded-2xl shadow-2xl shadow-black/50 shrink-0"
+						className="w-40 sm:w-52 rounded-2xl shadow-2xl shadow-black/60 shrink-0 self-end sm:self-auto"
+						style={{
+							boxShadow:
+								'0 8px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06)',
+						}}
 					/>
 
-					<div className="flex flex-col justify-end">
-						<h1 className="text-left text-4xl sm:text-5xl mb-3">{name}</h1>
+					<div className="flex flex-col justify-end gap-3">
+						<h1 className="text-left text-3xl sm:text-5xl leading-tight">
+							{name}
+						</h1>
 
-						<div className="flex items-center gap-3 text-sm text-gray-100 mb-4 flex-wrap">
-							<span className="text-accent font-bold text-base">
-								⭐ {title.vote_average?.toFixed(1)}
+						<div className="flex items-center gap-2.5 text-sm text-light-200/70 flex-wrap">
+							<span className="flex items-center gap-1 text-gold font-bold text-sm">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									className="h-4 w-4"
+									viewBox="0 0 24 24"
+									fill="currentColor"
+									aria-hidden="true"
+								>
+									<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+								</svg>
+								{title.vote_average?.toFixed(1)}
 							</span>
-							<span>•</span>
+							<span className="text-white/20">•</span>
 							<span>{year}</span>
-							<span>•</span>
+							<span className="text-white/20">•</span>
 							<span className="capitalize">{type}</span>
 							{title.runtime && (
 								<>
-									<span>•</span>
+									<span className="text-white/20">•</span>
 									<span>{title.runtime} min</span>
 								</>
 							)}
 						</div>
 
-						<p className="text-light-200 leading-7 max-w-2xl">
+						{title.genres && title.genres.length > 0 && (
+							<div className="flex flex-wrap gap-2">
+								{title.genres.map((g) => (
+									<span
+										key={g.id}
+										className="px-3 py-1 text-xs rounded-full border border-accent/25 bg-accent/10 text-accent/80"
+									>
+										{g.name}
+									</span>
+								))}
+							</div>
+						)}
+
+						<p className="text-light-200/75 leading-7 max-w-2xl text-sm sm:text-base mt-1">
 							{title.overview}
 						</p>
 
-						<div className="mt-6 flex flex-wrap gap-3">
+						<div className="mt-2 flex flex-wrap gap-3">
 							{trailer && (
 								<a
 									href={`https://www.youtube.com/watch?v=${trailer.key}`}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="inline-flex items-center gap-2 bg-accent text-primary font-semibold px-6 py-3 rounded-full hover:bg-accent/80 transition-colors"
+									className="btn-primary"
 								>
-									▶ Watch Trailer
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										className="h-4 w-4"
+										viewBox="0 0 24 24"
+										fill="currentColor"
+										aria-hidden="true"
+									>
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+									Watch Trailer
 								</a>
 							)}
 
@@ -200,56 +270,78 @@ const TitleDetailPage = () => {
 								aria-label={
 									saved ? 'Remove from watchlist' : 'Add to watchlist'
 								}
-								className={`inline-flex items-center gap-2 font-semibold px-6 py-3 rounded-full transition-colors ${
+								className={`inline-flex items-center gap-2 font-semibold px-6 py-3 rounded-full transition-all duration-200 text-sm cursor-pointer disabled:opacity-60 ${
 									saved
-										? 'bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/30'
-										: 'bg-white/10 text-white border border-white/10 hover:bg-white/20'
+										? 'bg-success/15 text-success border border-success/30 hover:bg-danger/15 hover:text-danger hover:border-danger/30'
+										: 'bg-white/5 text-light-100 border border-white/10 hover:bg-white/10 hover:border-white/20'
 								}`}
 							>
-								{saved ? '✓ Saved' : '+ Watchlist'}
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									className="h-4 w-4"
+									viewBox="0 0 24 24"
+									fill={saved ? 'currentColor' : 'none'}
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									aria-hidden="true"
+								>
+									<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+								</svg>
+								{saved ? 'Saved' : 'Add to Vault'}
 							</button>
-							<div className={'w-full mt-4'}>
-								<p clasName={'text-sm text-light-200 mb-2'}>Your Rating</p>
-								<div className={'flex gap-2'}>
-									{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
-										<button
-											key={value}
-											type="button"
-											onClick={() => saveRating(value)}
-											disabled={ratingLoading}
-											className={`px-3 py-2 rounded-full text-sm font-bold transition ${rating === value ? 'bg-accent text-primary' : 'bg-white/10 text-white hover:bg-white/20'}`}
-										>
-											{value}
-										</button>
-									))}
-									{ratingError && (
-										<p className={'text-red-400 text-xs mt-2'}>{ratingError}</p>
-									)}
-								</div>
+						</div>
+
+						<div className="mt-3">
+							<p className="text-xs font-semibold uppercase tracking-widest text-light-200/50 mb-2.5">
+								Your Rating
+							</p>
+							<div className="flex flex-wrap gap-1.5">
+								{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
+									<button
+										key={value}
+										type="button"
+										onClick={() => saveRating(value)}
+										disabled={ratingLoading}
+										className={`h-8 w-8 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer disabled:opacity-50 ${
+											rating === value
+												? 'bg-accent text-primary'
+												: 'bg-white/8 text-light-200/70 hover:bg-white/15 hover:text-light-100 border border-white/8'
+										}`}
+									>
+										{value}
+									</button>
+								))}
 							</div>
+							{ratingError && (
+								<p className="text-danger/80 text-xs mt-2">{ratingError}</p>
+							)}
 						</div>
 					</div>
 				</div>
 
 				{cast.length > 0 && (
-					<section className="mt-12">
-						<h2 className="mb-6">Cast</h2>
-						<div className="grid grid-cols-2 xs:grid-cols-4 md:grid-cols-8 gap-4">
+					<section className="mt-14">
+						<h2 className="mb-5">Cast</h2>
+						<div className="grid grid-cols-4 xs:grid-cols-4 md:grid-cols-8 gap-3">
 							{cast.map((person) => (
 								<div key={person.id} className="text-center">
-									<img
-										src={
-											person.profile_path
-												? `https://image.tmdb.org/t/p/w185${person.profile_path}`
-												: '/src/assets/No-Poster.png'
-										}
-										alt={person.name}
-										className="w-full aspect-square object-cover rounded-xl mb-2"
-									/>
+									<div className="relative overflow-hidden rounded-xl aspect-square mb-2">
+										<img
+											src={
+												person.profile_path
+													? `https://image.tmdb.org/t/p/w185${person.profile_path}`
+													: '/src/assets/No-Poster.png'
+											}
+											alt={person.name}
+											className="w-full h-full object-cover"
+										/>
+									</div>
 									<p className="text-xs text-light-100 font-medium line-clamp-1">
 										{person.name}
 									</p>
-									<p className="text-xs text-gray-100 line-clamp-1">
+									<p className="text-xs text-light-200/50 line-clamp-1">
 										{person.character}
 									</p>
 								</div>
@@ -260,7 +352,7 @@ const TitleDetailPage = () => {
 
 				{similarTitles.length > 0 && (
 					<section className="mt-14">
-						<h2 className="mb-6 text-left">Similar Titles</h2>
+						<h2 className="mb-5">Similar Titles</h2>
 						<div className="all-movies">
 							<ul>
 								{similarTitles.map((item) => (

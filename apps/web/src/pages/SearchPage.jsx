@@ -46,22 +46,23 @@ const SearchPage = () => {
 	);
 
 	return (
-		<main className="pattern">
-			<div className="wrapper pt-28">
-				<header className="mx-auto max-w-3xl text-center">
-					<p className="text-sm font-bold uppercase tracking-[0.24em] text-accent">
+		<main className="min-h-screen bg-primary">
+			<div className="wrapper pt-8">
+				<header className="mx-auto max-w-3xl text-center mt-0">
+					<p className="text-xs font-semibold uppercase tracking-widest text-accent mb-3">
 						Search
 					</p>
-					<h1 className="mt-4">Find your next watch</h1>
-					<p className="mx-auto mt-4 max-w-2xl text-light-200">
-						Search movies and series by title. Start typing at least 2
-						characters.
+					<h1 className="mt-0">Find your next watch</h1>
+					<p className="mx-auto mt-4 max-w-2xl text-light-200/70 text-sm">
+						Search movies and series by title.
 					</p>
 				</header>
 
-				<div className="search mx-auto mt-8 max-w-2xl">
+				<div className="search mx-auto mt-6 max-w-2xl">
 					<div>
-						<img src="/src/assets/search-icon-strong-glow.svg" alt="search" />
+						<svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 h-5 w-5 text-accent/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+							<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+						</svg>
 						<input
 							type="text"
 							placeholder="Search by title..."
@@ -71,9 +72,9 @@ const SearchPage = () => {
 					</div>
 				</div>
 
-				<section className="mt-12">
+				<section className="mt-10">
 					{!canSearch && (
-						<p className="py-10 text-center text-light-200">
+						<p className="py-10 text-center text-light-200/50 text-sm">
 							Type at least 2 characters to search.
 						</p>
 					)}
@@ -89,22 +90,23 @@ const SearchPage = () => {
 					)}
 
 					{canSearch && isError && (
-						<p role="alert" className="py-10 text-center text-red-400">
+						<p role="alert" className="py-10 text-center text-danger/80 text-sm">
 							Failed to load search results.
 						</p>
 					)}
 
 					{canSearch && !isLoading && !isError && titleResults.length === 0 && (
-						<p className="py-10 text-center text-light-200">
+						<p className="py-10 text-center text-light-200/50 text-sm">
 							No matching titles found.
 						</p>
 					)}
 
 					{titleResults.length > 0 && (
 						<>
-							<h2 className="mb-6 text-left">
-								Results for &quot;{debouncedQuery}&quot;
-							</h2>
+							<div className="flex items-baseline gap-3 mb-6">
+								<h2 className="mb-0">Results for &quot;{debouncedQuery}&quot;</h2>
+								<span className="text-sm text-gray-100">{titleResults.length} titles</span>
+							</div>
 							<div className="all-movies">
 								<ul>
 									{titleResults.map((movie) => (

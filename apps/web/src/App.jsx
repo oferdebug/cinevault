@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
+import { Toaster } from 'sonner';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const BrowsePage = lazy(() => import('./pages/BrowsePage'));
@@ -16,28 +17,39 @@ const CheckoutSuccessPage = lazy(() => import('./pages/CheckoutSuccessPage'));
 const AccountPage = lazy(() => import('./pages/AccountPage'));
 
 const App = () => {
-return (
-<BrowserRouter>
-<Suspense fallback={<div className="min-h-screen bg-primary" />}>
-<Routes>
-<Route element={<Layout />}>
-<Route index element={<HomePage />} />
-<Route path="/browse" element={<BrowsePage />} />
-<Route path="/search" element={<SearchPage />} />
-<Route path="/vault" element={<VaultPage />} />
-<Route path="/title/:id" element={<TitleDetailPage />} />
-<Route path="/watch/:id" element={<WatchPage />} />
-<Route path="/login" element={<LoginPage />} />
-<Route path="/signup" element={<SignupPage />} />
-<Route path="*" element={<NotFoundPage />} />
-<Route path="/subscribe" element={<SubscriptionPage />} />
-<Route path="/billing/success" element={<CheckoutSuccessPage />} />
-<Route path="/account" element={<AccountPage />} />
-</Route>
-</Routes>
-</Suspense>
-</BrowserRouter>
-);
+	return (
+		<BrowserRouter>
+			<Toaster
+				position="top-center"
+				theme="dark"
+				toastOptions={{
+					style: {
+						background: '#141927',
+						border: '1px solid rgba(255,255,255,0.08)',
+						color: '#f8fafc',
+					},
+				}}
+			/>
+			<Suspense fallback={<div className="min-h-screen bg-primary" />}>
+				<Routes>
+					<Route element={<Layout />}>
+						<Route index element={<HomePage />} />
+						<Route path="/browse" element={<BrowsePage />} />
+						<Route path="/search" element={<SearchPage />} />
+						<Route path="/vault" element={<VaultPage />} />
+						<Route path="/title/:id" element={<TitleDetailPage />} />
+						<Route path="/watch/:id" element={<WatchPage />} />
+						<Route path="/login" element={<LoginPage />} />
+						<Route path="/signup" element={<SignupPage />} />
+						<Route path="*" element={<NotFoundPage />} />
+						<Route path="/subscribe" element={<SubscriptionPage />} />
+						<Route path="/billing/success" element={<CheckoutSuccessPage />} />
+						<Route path="/account" element={<AccountPage />} />
+					</Route>
+				</Routes>
+			</Suspense>
+		</BrowserRouter>
+	);
 };
 
 export default App;
