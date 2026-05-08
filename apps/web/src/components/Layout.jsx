@@ -87,10 +87,7 @@ const NavbarAuth = () => {
 
 			<Link
 				to="/signup"
-				className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-primary transition-all duration-200 hover:bg-accent-2 cursor-pointer"
-				style={{ boxShadow: '0 0 0 0 transparent' }}
-				onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(99,102,241,0.35)'}
-				onMouseLeave={e => e.currentTarget.style.boxShadow = '0 0 0 0 transparent'}
+				className="cursor-pointer rounded-full bg-accent px-4 py-2 text-sm font-semibold text-primary shadow-[0_0_0_0_transparent] transition-all duration-200 hover:bg-accent-2 hover:shadow-[0_4px_16px_rgba(99,102,241,0.35)]"
 			>
 				Get Started
 			</Link>
