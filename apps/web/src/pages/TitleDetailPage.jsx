@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import MovieCard from '../components/MovieCard';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlistContext } from '../context/WatchlistContext';
@@ -88,14 +89,19 @@ const TitleDetailPage = () => {
 					vote_average: title.vote_average ?? 0,
 				});
 			}
-		} catch (err) {
-			console.error('TitleDetail toggle error:', err);
-			if (err?.message?.includes('vault_limit_reached')) {
-				alert(
-					'Free plan is limited to 20 titles. Upgrade to Plus for unlimited.',
-				);
+		} catch (error) {
+			console.error('Vault toggle error:', error);
+			if (error?.message?.includes('vault_limit_reached')) {
+				toast.error('Vault full', {
+					description:
+						'Free plan is limited to 20 titles. Upgrade to Plus for unlimited access.',
+					action: {
+						label: 'Upgrade',
+						onClick: () => navigate('/subscribe'),
+					},
+				});
 			} else {
-				alert('Something went wrong. Please try again.');
+				toast.error('Something went wrong. Please try again.');
 			}
 		} finally {
 			setToggleLoading(false);

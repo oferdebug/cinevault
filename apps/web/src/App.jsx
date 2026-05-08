@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
+import { Toaster } from 'sonner';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const BrowsePage = lazy(() => import('./pages/BrowsePage'));
@@ -18,6 +19,17 @@ const AccountPage = lazy(() => import('./pages/AccountPage'));
 const App = () => {
 	return (
 		<BrowserRouter>
+			<Toaster
+				position="top-center"
+				theme="dark"
+				toastOptions={{
+					style: {
+						background: '#141927',
+						border: '1px solid rgba(255,255,255,0.08)',
+						color: '#f8fafc',
+					},
+				}}
+			/>
 			<Suspense fallback={<div className="min-h-screen bg-primary" />}>
 				<Routes>
 					<Route element={<Layout />}>
