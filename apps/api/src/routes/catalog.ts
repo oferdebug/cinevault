@@ -1,4 +1,4 @@
-import { Router, type Response } from 'express';
+import { type Response, Router } from 'express';
 import pino from 'pino';
 import type { MediaType } from '../services/tmdb.js';
 import {

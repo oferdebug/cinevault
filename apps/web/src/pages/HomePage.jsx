@@ -98,27 +98,36 @@ export const HomePage = () => {
 		})
 		: [];
 	return (
-		<main className="relative min-h-screen overflow-x-hidden">
-			<img
-				src="/src/assets/BG.png"
-				alt=""
-				className="pointer-events-none fixed inset-0 w-full h-full object-cover z-0"
+		<main className="relative min-h-screen overflow-x-hidden bg-primary">
+			<div
+				className="pointer-events-none fixed inset-0 z-0"
+				style={{
+					background:
+						'radial-gradient(ellipse 90% 55% at 50% -5%, rgba(99,102,241,0.20) 0%, transparent 70%), radial-gradient(ellipse 50% 35% at 85% 15%, rgba(129,140,248,0.10) 0%, transparent 60%)',
+				}}
 			/>
 
-			<div className="wrapper pt-28 relative z-10">
-				<header>
+			<div className="wrapper pt-12 relative z-10">
+				<header className="mt-0">
+					<p className="mx-auto mb-4 w-fit rounded-full border border-accent/30 bg-accent/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-accent">
+						Discover &amp; Watch
+					</p>
 					<h1>
-						Stop Scrolling <span className="text-gradient">Tonight</span>
-						<br /> Unlock Your Next Watch.
+						Stop Scrolling{' '}
+						<span className="text-gradient">Tonight</span>
+						<br />
+						Unlock Your Next Watch.
 					</h1>
-					<p className="mx-auto mt-6 max-w-3xl text-center text-base leading-7 text-light-200">
+					<p className="mx-auto mt-5 max-w-2xl text-center text-base leading-7 text-light-200/80">
 						Search millions of movies and TV shows. Find your next obsession.
 					</p>
 				</header>
 
 				<div className="search max-w-2xl mx-auto">
 					<div>
-						<img src="/src/assets/search-icon-strong-glow.svg" alt="search" />
+						<svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 h-5 w-5 text-accent/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+							<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+						</svg>
 						<input
 							type="text"
 							placeholder="Search by title, mood, genre, or vibe..."
@@ -130,18 +139,14 @@ export const HomePage = () => {
 
 				<UnlockPicker titles={filteredMovies} />
 
-				<section className="mx-auto mt-7 max-w-5xl">
-					<div className="flex flex-wrap justify-center gap-3">
+				<section className="mx-auto mt-8 max-w-5xl">
+					<div className="flex flex-wrap justify-center gap-2.5">
 						{quickFilters.map((filter) => (
 							<button
 								key={filter}
 								type="button"
 								onClick={() => setActiveFilter(filter)}
-								className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
-									activeFilter === filter
-										? 'border-accent bg-accent text-primary'
-										: 'border-light-100/10 bg-dark-100/70 text-light-200 hover:border-accent/50 hover:text-light-100'
-								}`}
+								className={`pill-filter ${activeFilter === filter ? 'active' : ''}`}
 							>
 								{filter}
 							</button>
@@ -149,8 +154,13 @@ export const HomePage = () => {
 					</div>
 				</section>
 
-				<section className="mt-16">
-					<h2 className="mb-6">{sectionTitle}</h2>
+				<section className="mt-14">
+					<div className="flex items-baseline gap-3 mb-6">
+						<h2 className="mb-0">{sectionTitle}</h2>
+						{!isLoading && filteredMovies.length > 0 && (
+							<span className="text-sm text-gray-100">{filteredMovies.length} titles</span>
+						)}
+					</div>
 
 					{isLoading && (
 						<div className="all-movies">
@@ -163,13 +173,13 @@ export const HomePage = () => {
 					)}
 
 					{isError && (
-						<p className="text-red-400 text-center py-10">
-							Failed to load movies.
+						<p className="text-danger/80 text-center py-10">
+							Failed to load movies. Please try again.
 						</p>
 					)}
 
 					{!isLoading && !isError && filteredMovies.length === 0 && (
-						<p className="py-10 text-center text-light-200">
+						<p className="py-10 text-center text-light-200/60">
 							No titles found for this filter.
 						</p>
 					)}

@@ -69,84 +69,71 @@ const AccountPage = () => {
 	};
 
 	return (
-		<main className={'min-h-screen bg-primary px-8 pt-28 pb-20'}>
-			<section className={'mx-auto max-w-3xl'}>
-				<h1 className={'text-3xl font-bold text-light-100 sm:text-4xl'}>
-					Account
-				</h1>
-				<p className={'mt-2 text-light-200'}>
+		<main className='min-h-screen bg-primary px-5 xs:px-8 pt-8 pb-20'>
+			<section className='mx-auto max-w-3xl'>
+				<p className='text-xs font-semibold uppercase tracking-widest text-accent mb-2'>Account</p>
+				<h1 className='text-left text-4xl sm:text-5xl'>Settings</h1>
+				<p className='mt-3 text-light-200/70 text-sm'>
 					Manage your subscription and billing.
 				</p>
 
 				{error && (
-					<div className={'mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-300'}>
+					<div className='mt-6 rounded-xl border border-danger/30 bg-danger/10 p-4 text-danger/80 text-sm'>
 						{error}
 					</div>
 				)}
 
-				<div className={'mt-8 rounded-3xl border border-light-100/10 bg-dark-100/70 p-8'}>
-					<h2 className={'text-xl font-bold text-light-100'}>
-						Current Plan
-					</h2>
+				<div className='mt-8 glass-card p-7'>
+					<p className='text-xs font-semibold uppercase tracking-widest text-accent mb-1'>Subscription</p>
+					<h2 className='text-xl font-bold text-light-100 mb-5'>Current Plan</h2>
 
 					{loading && (
-						<p className={'mt-4 text-light-200'}>Loading...</p>
+						<div className='flex items-center gap-2'>
+							<div className='h-4 w-4 rounded-full border-2 border-accent border-t-transparent animate-spin' />
+							<p className='text-light-200/60 text-sm'>Loading…</p>
+						</div>
 					)}
 
 					{!loading && !subscription && (
-						<div className={'mt-4'}>
-							<p className={'text-light-200'}>
-								You're on the Free plan.
-							</p>
-							<Link
-								to={'/subscribe'}
-								className={'mt-6 inline-block rounded-full bg-accent px-6 py-3 font-medium text-primary transition hover:bg-accent/80'}
-							>
+						<div>
+							<p className='text-light-200/70 text-sm mb-5'>You're on the <span className='text-light-100 font-semibold'>Free</span> plan.</p>
+							<Link to='/subscribe' className='btn-primary'>
 								Upgrade your plan
 							</Link>
 						</div>
 					)}
 
 					{!loading && subscription && (
-						<div className={'mt-4 space-y-4'}>
-							<div className={'flex items-center gap-3'}>
-								<span className={'text-2xl font-bold text-light-100'}>
-									{planLabel(subscription.plan_id)}
-								</span>
-								<span className={'rounded-full bg-accent/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-accent'}>
+						<div className='space-y-5'>
+							<div className='flex items-center gap-3'>
+								<span className='text-2xl font-bold text-light-100'>{planLabel(subscription.plan_id)}</span>
+								<span className='rounded-full bg-accent/15 border border-accent/25 px-3 py-1 text-xs font-bold uppercase tracking-wider text-accent'>
 									{subscription.billing_interval}
 								</span>
 							</div>
 
-							<dl className={'space-y-2 text-sm'}>
-								<div className={'flex justify-between'}>
-									<dt className={'text-light-200'}>Status</dt>
-									<dd className={'font-medium text-light-100 capitalize'}>
-										{subscription.status}
-									</dd>
+							<dl className='space-y-3 text-sm border-t border-white/5 pt-4'>
+								<div className='flex justify-between'>
+									<dt className='text-light-200/60'>Status</dt>
+									<dd className='font-medium text-success capitalize'>{subscription.status}</dd>
 								</div>
-								<div className={'flex justify-between'}>
-									<dt className={'text-light-200'}>
-										{subscription.cancel_at_period_end ? 'Ends on' : 'Renews on'}
-									</dt>
-									<dd className={'font-medium text-light-100'}>
-										{formatDate(subscription.current_period_end)}
-									</dd>
+								<div className='flex justify-between'>
+									<dt className='text-light-200/60'>{subscription.cancel_at_period_end ? 'Ends on' : 'Renews on'}</dt>
+									<dd className='font-medium text-light-100'>{formatDate(subscription.current_period_end)}</dd>
 								</div>
 							</dl>
 
 							{subscription.cancel_at_period_end && (
-								<div className={'rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-4 text-sm text-yellow-300'}>
-									Your subscription will end on{' '}
-									{formatDate(subscription.current_period_end)}. You'll lose access then.
+								<div className='rounded-xl border border-gold/25 bg-gold/10 p-4 text-sm text-gold/90'>
+									Your subscription will end on {formatDate(subscription.current_period_end)}. You'll lose access then.
 								</div>
 							)}
 
 							<button
-								type={'button'}
+								type='button'
 								onClick={openPortal}
 								disabled={portalLoading}
-								className={'mt-4 rounded-full bg-accent px-6 py-3 font-medium text-primary transition hover:bg-accent/80 disabled:cursor-not-allowed disabled:opacity-60'}
+								className='btn-primary disabled:cursor-not-allowed disabled:opacity-60'
 							>
 								{portalLoading ? 'Opening…' : 'Manage subscription'}
 							</button>
