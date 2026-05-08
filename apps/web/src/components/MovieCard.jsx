@@ -1,3 +1,4 @@
+import { usePostHog } from '@posthog/react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -39,6 +40,7 @@ const MovieCard = ({ movie }) => {
 	const { isInWatchlist, removeFromWatchlist, addToWatchlist } =
 		useWatchlistContext();
 	const [loading, setLoading] = useState(false);
+	const posthog = usePostHog();
 
 	const saved = isInWatchlist(movie.id);
 	const title = movie.title ?? movie.name;
@@ -82,6 +84,13 @@ const MovieCard = ({ movie }) => {
 					vote_average: movie.vote_average ?? 0,
 				});
 			}
+			posthog?.capture('vault_toggle', {
+				tmdb_id: movie.id,
+				media_type: mediaType,
+				saved: !saved,
+				user_id: user.id,
+				timestamp: new Date().toISOString(),
+			});
 		} catch (error) {
 			console.error('Vault toggle error:', error);
 			if (error?.message?.includes('vault_limit_reached')) {
@@ -96,6 +105,8 @@ const MovieCard = ({ movie }) => {
 			} else {
 				toast.error('Something went wrong. Please try again.');
 			}
+		} finally {
+			setLoading(false);
 		}
 	};
 
