@@ -9,15 +9,19 @@ import {
 	type Plan,
 } from '../lib/plans';
 import supabase from '../lib/supabase';
+import { usePostHog } from '@posthog/react';
 
 const SubscriptionPage = () => {
 	const navigate = useNavigate();
+	const posthog = usePostHog();
 	const [interval, setInterval] = React.useState<BillingInterval>('monthly');
 	const [loadingPlanId, setLoadingPlanId] = React.useState<string | null>(null);
 	const [error, setError] = React.useState<string | null>(null);
 
 	const handleSubscribe = async (plan: Plan) => {
 		console.log('handleSubscribe called for plan:', plan.id);
+		console.log('posthog instance:', posthog);
+		setLoadingPlanId(plan.id);
 		setError(null);
 
 		if (plan.id === 'free') {
@@ -36,11 +40,18 @@ const SubscriptionPage = () => {
 			return;
 		}
 
+
 		const priceId = plan.stripePriceIds[interval];
 		if (!priceId) {
 			setError('This plan is not available for the selected interval.');
 			return;
 		}
+
+		posthog?.capture('subscribe_clicked',{
+			plan_id:plan.id,
+			billing_interval:interval,
+			price_id:priceId,
+		},{send_instantly:true});
 
 		setLoadingPlanId(plan.id);
 		try {
