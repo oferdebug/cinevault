@@ -19,8 +19,6 @@ const SubscriptionPage = () => {
 	const [error, setError] = React.useState<string | null>(null);
 
 	const handleSubscribe = async (plan: Plan) => {
-		console.log('handleSubscribe called for plan:', plan.id);
-		console.log('posthog instance:', posthog);
 		setLoadingPlanId(plan.id);
 		setError(null);
 
@@ -39,8 +37,6 @@ const SubscriptionPage = () => {
 			navigate('/login?redirect=/subscribe');
 			return;
 		}
-
-
 		const priceId = plan.stripePriceIds[interval];
 		if (!priceId) {
 			setError('This plan is not available for the selected interval.');
