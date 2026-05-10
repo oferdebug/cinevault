@@ -32,3 +32,4 @@ packages/*/dist/
 *.sw?
 .claude/
 .env.local
+.windsurf/
