@@ -1,6 +1,4 @@
-import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../lib/axios';
+import { usePostHog } from '@posthog/react';
 import {
 	type BillingInterval,
 	getEffectiveMonthly,
@@ -8,8 +6,10 @@ import {
 	PLANS,
 	type Plan,
 } from '../lib/plans';
+import api from '../lib/axios';
+import { useNavigate } from 'react-router-dom';
+import * as React from 'react';
 import supabase from '../lib/supabase';
-import { usePostHog } from '@posthog/react';
 
 const SubscriptionPage = () => {
 	const navigate = useNavigate();
@@ -22,35 +22,39 @@ const SubscriptionPage = () => {
 		setLoadingPlanId(plan.id);
 		setError(null);
 
-		if (plan.id === 'free') {
+		try {
+			if (plan.id === 'free') {
+				const {
+					data: { session },
+				} = await supabase.auth.getSession();
+				navigate(session ? '/' : '/signup');
+				return;
+			}
+
 			const {
 				data: { session },
 			} = await supabase.auth.getSession();
-			navigate(session ? '/' : '/signup');
-			return;
-		}
+			if (!session) {
+				navigate('/login?redirect=/subscribe');
+				return;
+			}
 
-		const {
-			data: { session },
-		} = await supabase.auth.getSession();
-		if (!session) {
-			navigate('/login?redirect=/subscribe');
-			return;
-		}
-		const priceId = plan.stripePriceIds[interval];
-		if (!priceId) {
-			setError('This plan is not available for the selected interval.');
-			return;
-		}
+			const priceId = plan.stripePriceIds[interval];
+			if (!priceId) {
+				setError('This plan is not available for the selected interval.');
+				return;
+			}
 
-		posthog?.capture('subscribe_clicked',{
-			plan_id:plan.id,
-			billing_interval:interval,
-			price_id:priceId,
-		},{send_instantly:true});
+			posthog?.capture(
+				'subscribe_clicked',
+				{
+					plan_id: plan.id,
+					billing_interval: interval,
+					price_id: priceId,
+				},
+				{ send_instantly: true },
+			);
 
-		setLoadingPlanId(plan.id);
-		try {
 			const { data } = await api.post('/billing/checkout', { priceId });
 			if (data?.ok && data.data?.url) {
 				window.location.href = data.data.url;
@@ -66,46 +70,59 @@ const SubscriptionPage = () => {
 			setLoadingPlanId(null);
 		}
 	};
-
 	return (
-		<main className='min-h-screen bg-primary px-5 xs:px-8 pt-8 pb-20 relative overflow-hidden'>
+		<main className="min-h-screen bg-primary px-5 xs:px-8 pt-8 pb-20 relative overflow-hidden">
 			<div
-				className='pointer-events-none absolute inset-0'
-				style={{ background: 'radial-gradient(ellipse 80% 50% at 50% -5%, rgba(99,102,241,0.20), transparent)' }}
+				className="pointer-events-none absolute inset-0"
+				style={{
+					background:
+						'radial-gradient(ellipse 80% 50% at 50% -5%, rgba(99,102,241,0.20), transparent)',
+				}}
 			/>
-			<section className='mx-auto max-w-7xl relative z-10'>
-				<div className='text-center mb-10'>
-					<p className='text-xs font-semibold uppercase tracking-widest text-accent mb-3'>CineVault Plans</p>
-					<h1 className='text-4xl sm:text-5xl'>
+			<section className="mx-auto max-w-7xl relative z-10">
+				<div className="text-center mb-10">
+					<p className="text-xs font-semibold uppercase tracking-widest text-accent mb-3">
+						CineVault Plans
+					</p>
+					<h1 className="text-4xl sm:text-5xl">
 						Choose the plan that&apos;s right for you.
 					</h1>
-					<p className='mx-auto mt-4 max-w-2xl text-light-200/70 text-sm leading-7'>
-						Start free, then unlock smarter recommendations, unlimited vault space, and advanced taste insights.
+					<p className="mx-auto mt-4 max-w-2xl text-light-200/70 text-sm leading-7">
+						Start free, then unlock smarter recommendations, unlimited vault
+						space, and advanced taste insights.
 					</p>
 				</div>
 
-				<div className='flex justify-center mb-8'>
-					<div className='inline-flex items-center gap-1 rounded-full border border-white/8 bg-surface-2/80 p-1 backdrop-blur-md'>
+				<div className="flex justify-center mb-8">
+					<div className="inline-flex items-center gap-1 rounded-full border border-white/8 bg-surface-2/80 p-1 backdrop-blur-md">
 						<button
-							type='button'
+							type="button"
 							onClick={() => setInterval('monthly')}
 							className={`rounded-full px-5 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer ${
-								interval === 'monthly' ? 'bg-accent text-primary' : 'text-light-200/70 hover:text-light-100'
+								interval === 'monthly'
+									? 'bg-accent text-primary'
+									: 'text-light-200/70 hover:text-light-100'
 							}`}
 						>
 							Monthly
 						</button>
 						<button
-							type='button'
+							type="button"
 							onClick={() => setInterval('yearly')}
 							className={`flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer ${
-								interval === 'yearly' ? 'bg-accent text-primary' : 'text-light-200/70 hover:text-light-100'
+								interval === 'yearly'
+									? 'bg-accent text-primary'
+									: 'text-light-200/70 hover:text-light-100'
 							}`}
 						>
 							Yearly
-							<span className={`rounded-full px-2 py-0.5 text-xs font-bold ${
-								interval === 'yearly' ? 'bg-primary/30 text-primary' : 'bg-accent/15 text-accent'
-							}`}>
+							<span
+								className={`rounded-full px-2 py-0.5 text-xs font-bold ${
+									interval === 'yearly'
+										? 'bg-primary/30 text-primary'
+										: 'bg-accent/15 text-accent'
+								}`}
+							>
 								Save 17%
 							</span>
 						</button>
@@ -113,12 +130,12 @@ const SubscriptionPage = () => {
 				</div>
 
 				{error && (
-					<div className='mx-auto mb-6 max-w-xl rounded-xl border border-danger/30 bg-danger/10 p-4 text-center text-danger/80 text-sm'>
+					<div className="mx-auto mb-6 max-w-xl rounded-xl border border-danger/30 bg-danger/10 p-4 text-center text-danger/80 text-sm">
 						{error}
 					</div>
 				)}
 
-				<div className='grid gap-5 md:grid-cols-3'>
+				<div className="grid gap-5 md:grid-cols-3">
 					{PLANS.map((plan) => {
 						const isFree = plan.monthlyPrice === 0;
 						const isYearly = interval === 'yearly';
@@ -146,32 +163,61 @@ const SubscriptionPage = () => {
 										? 'border-accent/50 bg-surface-2/90'
 										: 'border-white/6 bg-surface-2/60'
 								}`}
-								style={plan.popular ? { boxShadow: '0 0 40px rgba(99,102,241,0.15), 0 4px 24px rgba(0,0,0,0.4)' } : { boxShadow: '0 4px 16px rgba(0,0,0,0.3)' }}
+								style={
+									plan.popular
+										? {
+												boxShadow:
+													'0 0 40px rgba(99,102,241,0.15), 0 4px 24px rgba(0,0,0,0.4)',
+											}
+										: { boxShadow: '0 4px 16px rgba(0,0,0,0.3)' }
+								}
 							>
 								{plan.popular && (
-									<div className='absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-4 py-1 text-xs font-bold uppercase tracking-wider text-primary whitespace-nowrap'>
+									<div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-4 py-1 text-xs font-bold uppercase tracking-wider text-primary whitespace-nowrap">
 										Most Popular
 									</div>
 								)}
 
-								<p className='text-xs font-semibold uppercase tracking-widest text-accent/80 mb-2'>{plan.name}</p>
-								<div className='flex items-baseline gap-1 mb-1'>
-									<span className='text-4xl font-bold text-light-100' style={{ fontFamily: 'Righteous, sans-serif' }}>
+								<p className="text-xs font-semibold uppercase tracking-widest text-accent/80 mb-2">
+									{plan.name}
+								</p>
+								<div className="flex items-baseline gap-1 mb-1">
+									<span
+										className="text-4xl font-bold text-light-100"
+										style={{ fontFamily: 'Righteous, sans-serif' }}
+									>
 										{displayPrice}
 									</span>
 									{priceSuffix && (
-										<span className='text-light-200/50 text-sm'>{priceSuffix}</span>
+										<span className="text-light-200/50 text-sm">
+											{priceSuffix}
+										</span>
 									)}
 								</div>
-								<p className='text-light-200/60 text-xs mb-5'>{billingNote}</p>
+								<p className="text-light-200/60 text-xs mb-5">{billingNote}</p>
 
-								<p className='text-light-200/70 text-sm leading-6 mb-5'>{plan.description}</p>
+								<p className="text-light-200/70 text-sm leading-6 mb-5">
+									{plan.description}
+								</p>
 
-								<ul className='space-y-3 mb-7 flex-1'>
+								<ul className="space-y-3 mb-7 flex-1">
 									{plan.features.map((feature) => (
-										<li key={feature} className='flex items-start gap-2.5 text-sm text-light-200/80'>
-											<svg xmlns='http://www.w3.org/2000/svg' className='h-4 w-4 mt-0.5 text-accent shrink-0' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2.5' strokeLinecap='round' strokeLinejoin='round' aria-hidden='true'>
-												<polyline points='20 6 9 17 4 12'/>
+										<li
+											key={feature}
+											className="flex items-start gap-2.5 text-sm text-light-200/80"
+										>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												className="h-4 w-4 mt-0.5 text-accent shrink-0"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												strokeWidth="2.5"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												aria-hidden="true"
+											>
+												<polyline points="20 6 9 17 4 12" />
 											</svg>
 											{feature}
 										</li>
@@ -179,7 +225,7 @@ const SubscriptionPage = () => {
 								</ul>
 
 								<button
-									type='button'
+									type="button"
 									onClick={() => handleSubscribe(plan)}
 									disabled={isLoading || loadingPlanId !== null}
 									className={`w-full rounded-full px-4 py-3 text-sm font-semibold transition-all duration-200 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 ${
@@ -187,7 +233,11 @@ const SubscriptionPage = () => {
 											? 'bg-accent text-primary hover:bg-accent-2'
 											: 'bg-white/6 border border-white/10 text-light-100 hover:bg-white/12 hover:border-white/20'
 									}`}
-									style={plan.popular && !isLoading ? { boxShadow: '0 4px 16px rgba(99,102,241,0.3)' } : {}}
+									style={
+										plan.popular && !isLoading
+											? { boxShadow: '0 4px 16px rgba(99,102,241,0.3)' }
+											: {}
+									}
 								>
 									{isLoading ? 'Redirecting…' : plan.cta}
 								</button>
