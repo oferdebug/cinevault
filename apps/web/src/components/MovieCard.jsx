@@ -66,6 +66,11 @@ const MovieCard = ({ movie }) => {
 					.eq('tmdb_id', movie.id);
 				if (error) throw error;
 				removeFromWatchlist(movie.id);
+				posthog?.capture('vault_title_removed', {
+					tmdb_id: movie.id,
+					media_type: mediaType,
+					title,
+				});
 			} else {
 				const { error } = await supabase.from('watchlist').insert({
 					user_id: user.id,
@@ -83,14 +88,12 @@ const MovieCard = ({ movie }) => {
 					poster_path: movie.poster_path,
 					vote_average: movie.vote_average ?? 0,
 				});
+				posthog?.capture('vault_title_added', {
+					tmdb_id: movie.id,
+					media_type: mediaType,
+					title,
+				});
 			}
-			posthog?.capture('vault_toggle', {
-				tmdb_id: movie.id,
-				media_type: mediaType,
-				saved: !saved,
-				user_id: user.id,
-				timestamp: new Date().toISOString(),
-			});
 		} catch (error) {
 			console.error('Vault toggle error:', error);
 			if (error?.message?.includes('vault_limit_reached')) {
