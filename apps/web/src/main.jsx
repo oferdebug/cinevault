@@ -9,11 +9,6 @@ import { AuthProvider } from './context/AuthContext';
 import { WatchlistProvider } from './context/WatchlistContext';
 import './index.css';
 
-posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, {
-	api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
-	defaults: '2026-01-30',
-});
-
 const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
@@ -21,6 +16,12 @@ const queryClient = new QueryClient({
 			retry: 1,
 		},
 	},
+});
+
+posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, {
+	api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+	defaults: '2026-01-30',
+	autocapture: false,
 });
 
 createRoot(document.getElementById('root')).render(
