@@ -2,6 +2,7 @@
 @import "tailwindcss";
 
 @theme {
+	--font-display: "Instrument Serif", serif;
 	--color-primary: #0a0e1a;
 	--color-surface: #0f1422;
 	--color-surface-2: #141927;
@@ -52,12 +53,14 @@
 
 	h1 {
 		@apply mx-auto max-w-4xl text-center text-5xl font-bold leading-tight tracking-tight text-light-100 sm:text-[64px] sm:leading-[76px];
-		font-family: "Righteous", sans-serif;
+		font-family: var(--font-display);
+		font-style: italic;
 	}
 
 	h2 {
 		@apply text-2xl font-bold text-light-100 sm:text-3xl;
-		font-family: "Righteous", sans-serif;
+		font-family: var(--font-display);
+		font-style: italic;
 	}
 
 	h3 {

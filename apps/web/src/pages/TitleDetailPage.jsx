@@ -1,3 +1,4 @@
+import { usePostHog } from '@posthog/react';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -24,6 +25,7 @@ const TitleDetailPage = () => {
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const { user } = useAuth();
+	const posthog = usePostHog();
 	const { isInWatchlist, addToWatchlist, removeFromWatchlist } =
 		useWatchlistContext();
 	const [toggleLoading, setToggleLoading] = useState(false);
@@ -71,6 +73,11 @@ const TitleDetailPage = () => {
 					.eq('tmdb_id', Number(id));
 				if (error) throw error;
 				removeFromWatchlist(Number(id));
+				posthog?.capture('vault_title_removed', {
+					tmdb_id: Number(id),
+					media_type: type,
+					title: name,
+				});
 			} else {
 				const { error } = await supabase.from('watchlist').insert({
 					user_id: user.id,
@@ -87,6 +94,11 @@ const TitleDetailPage = () => {
 					title: name,
 					poster_path: title.poster_path,
 					vote_average: title.vote_average ?? 0,
+				});
+				posthog?.capture('vault_title_added', {
+					tmdb_id: Number(id),
+					media_type: type,
+					title: name,
 				});
 			}
 		} catch (error) {

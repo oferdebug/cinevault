@@ -1,5 +1,7 @@
+import { usePostHog } from '@posthog/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import MovieCard from '../components/MovieCard';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlistContext } from '../context/WatchlistContext';
@@ -12,10 +14,9 @@ import { getVaultStats } from '../utils/getVaultStats';
 const VaultPage = () => {
 	const navigate = useNavigate();
 	const { user, loading: authLoading } = useAuth();
-	const { vaultItems, removeFromWatchlist, refresh, loading } =
-		useWatchlistContext();
+	const posthog = usePostHog();
+	const { vaultItems, removeFromWatchlist, loading } = useWatchlistContext();
 	const { ratings } = useUserRatings();
-	const [error, setError] = useState('');
 	const [removingId, setRemovingId] = useState(null);
 	const [recommendations, setRecommendations] = useState([]);
 
@@ -67,22 +68,27 @@ const VaultPage = () => {
 
 	const handleRemove = async (item) => {
 		setRemovingId(item.id);
-		setError('');
+		try {
+			const { error } = await supabase
+				.from('watchlist')
+				.delete()
+				.eq('id', item.id)
+				.eq('user_id', user.id);
+			if (error) throw error;
 
-		removeFromWatchlist(item.tmdb_id);
+			removeFromWatchlist(item.tmdb_id);
 
-		const { error: deleteError } = await supabase
-			.from('watchlist')
-			.delete()
-			.eq('id', item.id)
-			.eq('user_id', user.id);
-
-		if (deleteError) {
-			setError('Failed to remove title from your vault.');
-			void refresh();
+			posthog?.capture('vault_title_removed', {
+				tmdb_id: item.tmdb_id,
+				media_type: item.media_type,
+				title: item.title,
+			});
+		} catch (error) {
+			console.error('Vault remove error:', error);
+			toast.error('Failed to remove title from your vault.');
+		} finally {
+			setRemovingId(null);
 		}
-
-		setRemovingId(null);
 	};
 
 	useEffect(() => {
@@ -152,15 +158,30 @@ const VaultPage = () => {
 			<main className="min-h-screen bg-primary px-5 xs:px-8 pt-10 pb-20 flex items-center justify-center">
 				<section className="mx-auto max-w-lg glass-card p-10 text-center">
 					<div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-accent/20 bg-accent/10">
-						<svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-							<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-							<path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							className="h-7 w-7 text-accent"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							aria-hidden="true"
+						>
+							<rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+							<path d="M7 11V7a5 5 0 0 1 10 0v4" />
 						</svg>
 					</div>
-					<p className="text-xs font-semibold uppercase tracking-widest text-accent mb-3">My Vault</p>
-					<h2 className="text-2xl font-bold text-light-100">Sign in to open your vault.</h2>
+					<p className="text-xs font-semibold uppercase tracking-widest text-accent mb-3">
+						My Vault
+					</p>
+					<h2 className="text-2xl font-bold text-light-100">
+						Sign in to open your vault.
+					</h2>
 					<p className="mx-auto mt-3 max-w-sm text-light-200/70 text-sm leading-6">
-						Save movies and shows, then come back to your personal CineVault anytime.
+						Save movies and shows, then come back to your personal CineVault
+						anytime.
 					</p>
 					<button
 						type="button"
@@ -178,7 +199,9 @@ const VaultPage = () => {
 		<main className="min-h-screen bg-primary px-5 xs:px-8 pt-8 pb-24">
 			<section className="mx-auto max-w-6xl">
 				<div className="mb-8">
-					<p className="text-xs font-semibold uppercase tracking-widest text-accent mb-2">My Vault</p>
+					<p className="text-xs font-semibold uppercase tracking-widest text-accent mb-2">
+						My Vault
+					</p>
 					<h1 className="text-left text-4xl sm:text-5xl">Your saved titles</h1>
 					<p className="mt-3 max-w-2xl text-light-200/70 text-sm">
 						Everything you saved from CineVault, ready when you are.
@@ -187,17 +210,27 @@ const VaultPage = () => {
 					{vaultItems.length > 0 && (
 						<>
 							<div className="mt-8 glass-card p-6 border-accent/15">
-								<p className="text-xs font-semibold uppercase tracking-widest text-accent mb-2">Your Taste Profile</p>
-								<p className="text-xl font-semibold text-light-100 leading-7">{tasteSummary}</p>
+								<p className="text-xs font-semibold uppercase tracking-widest text-accent mb-2">
+									Your Taste Profile
+								</p>
+								<p className="text-xl font-semibold text-light-100 leading-7">
+									{tasteSummary}
+								</p>
 							</div>
 
 							<div className="mt-6 grid gap-4 grid-cols-2 lg:grid-cols-4">
 								<div className="stat-card">
-									<p className="text-xs text-light-200/60 uppercase tracking-wider mb-1">Total Titles</p>
-									<p className="text-3xl font-bold text-light-100">{vaultStats.totalTitles}</p>
+									<p className="text-xs text-light-200/60 uppercase tracking-wider mb-1">
+										Total Titles
+									</p>
+									<p className="text-3xl font-bold text-light-100">
+										{vaultStats.totalTitles}
+									</p>
 								</div>
 								<div className="stat-card">
-									<p className="text-xs text-light-200/60 uppercase tracking-wider mb-1">Movies / Series</p>
+									<p className="text-xs text-light-200/60 uppercase tracking-wider mb-1">
+										Movies / Series
+									</p>
 									<p className="text-3xl font-bold text-light-100">
 										{vaultStats.movieCount}
 										<span className="text-lg text-light-200/40 mx-1">/</span>
@@ -205,32 +238,56 @@ const VaultPage = () => {
 									</p>
 								</div>
 								<div className="stat-card">
-									<p className="text-xs text-light-200/60 uppercase tracking-wider mb-1">Avg. Rating</p>
-									<p className="text-3xl font-bold text-gold">{vaultStats.averageRating.toFixed(1)}</p>
+									<p className="text-xs text-light-200/60 uppercase tracking-wider mb-1">
+										Avg. Rating
+									</p>
+									<p className="text-3xl font-bold text-gold">
+										{vaultStats.averageRating.toFixed(1)}
+									</p>
 								</div>
 								<div className="stat-card border-accent/15">
-									<p className="text-xs text-light-200/60 uppercase tracking-wider mb-1">Highest Rated</p>
-									<p className="line-clamp-1 text-base font-semibold text-light-100">{vaultStats.highestRated?.title ?? 'None'}</p>
+									<p className="text-xs text-light-200/60 uppercase tracking-wider mb-1">
+										Highest Rated
+									</p>
+									<p className="line-clamp-1 text-base font-semibold text-light-100">
+										{vaultStats.highestRated?.title ?? 'None'}
+									</p>
 									<p className="mt-1 text-sm text-gold flex items-center gap-1">
-										<svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-											<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											className="h-3.5 w-3.5"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+											aria-hidden="true"
+										>
+											<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
 										</svg>
-										{Number(vaultStats.highestRated?.vote_average ?? 0).toFixed(1)}
+										{Number(vaultStats.highestRated?.vote_average ?? 0).toFixed(
+											1,
+										)}
 									</p>
 								</div>
 							</div>
 
 							<div className="mt-10 glass-card p-6 border-accent/15">
-								<p className="text-xs font-semibold uppercase tracking-widest text-accent mb-2">Recommendations</p>
-								<h2 className="text-xl font-bold text-light-100">{recommendationTitle}</h2>
-								<p className="mt-1 text-light-200/70 text-sm">{recommendationDescription}</p>
+								<p className="text-xs font-semibold uppercase tracking-widest text-accent mb-2">
+									Recommendations
+								</p>
+								<h2 className="text-xl font-bold text-light-100">
+									{recommendationTitle}
+								</h2>
+								<p className="mt-1 text-light-200/70 text-sm">
+									{recommendationDescription}
+								</p>
 
 								{mainSeed && (
 									<button
 										type="button"
 										className="btn-secondary mt-4 text-xs px-4 py-2"
 										onClick={() =>
-											navigate(`/title/${mainSeed.tmdb_id}?type=${mainSeed.media_type ?? 'movie'}`)
+											navigate(
+												`/title/${mainSeed.tmdb_id}?type=${mainSeed.media_type ?? 'movie'}`,
+											)
 										}
 									>
 										View Similar Titles
@@ -241,7 +298,10 @@ const VaultPage = () => {
 									<div className="mt-6 all-movies">
 										<ul>
 											{recommendations.map((movie) => (
-												<MovieCard key={`${movie.media_type}-${movie.id}`} movie={movie} />
+												<MovieCard
+													key={`${movie.media_type}-${movie.id}`}
+													movie={movie}
+												/>
 											))}
 										</ul>
 									</div>
@@ -251,18 +311,30 @@ const VaultPage = () => {
 					)}
 				</div>
 
-				{error && <p className="mb-6 text-danger/80 text-sm">{error}</p>}
-
 				{vaultItems.length === 0 ? (
 					<div className="glass-card p-10 text-center">
 						<div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-white/8 bg-surface-3">
-							<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-light-200/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-								<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-								<path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								className="h-6 w-6 text-light-200/40"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="1.5"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								aria-hidden="true"
+							>
+								<rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+								<path d="M7 11V7a5 5 0 0 1 10 0v4" />
 							</svg>
 						</div>
-						<h2 className="text-xl font-bold text-light-100">Your vault is empty.</h2>
-						<p className="mt-2 text-light-200/60 text-sm">Start saving titles from the home page or title detail pages.</p>
+						<h2 className="text-xl font-bold text-light-100">
+							Your vault is empty.
+						</h2>
+						<p className="mt-2 text-light-200/60 text-sm">
+							Start saving titles from the home page or title detail pages.
+						</p>
 						<button
 							type="button"
 							onClick={() => navigate('/')}
@@ -280,7 +352,10 @@ const VaultPage = () => {
 									: '/src/assets/No-Poster.png';
 
 								return (
-									<li key={item.id ?? item.tmdb_id} className="movie-card relative">
+									<li
+										key={item.id ?? item.tmdb_id}
+										className="movie-card relative"
+									>
 										<button
 											type="button"
 											aria-label="Remove from vault"
@@ -291,8 +366,19 @@ const VaultPage = () => {
 											{removingId === item.id ? (
 												<div className="h-3 w-3 rounded-full border border-danger border-t-transparent animate-spin" />
 											) : (
-												<svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-													<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													className="h-3.5 w-3.5"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													strokeWidth="2.5"
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													aria-hidden="true"
+												>
+													<line x1="18" y1="6" x2="6" y2="18" />
+													<line x1="6" y1="6" x2="18" y2="18" />
 												</svg>
 											)}
 										</button>
@@ -301,16 +387,28 @@ const VaultPage = () => {
 											type="button"
 											className="w-full cursor-pointer text-left"
 											onClick={() =>
-												navigate(`/title/${item.tmdb_id}?type=${item.media_type ?? 'movie'}`)
+												navigate(
+													`/title/${item.tmdb_id}?type=${item.media_type ?? 'movie'}`,
+												)
 											}
 										>
-											<img src={posterSrc} alt={item.title} className="card-poster w-full" />
+											<img
+												src={posterSrc}
+												alt={item.title}
+												className="card-poster w-full"
+											/>
 											<div className="card-inner">
 												<h3>{item.title}</h3>
 												<div className="content">
 													<div className="rating">
-														<svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-gold" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-															<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+														<svg
+															xmlns="http://www.w3.org/2000/svg"
+															className="h-3.5 w-3.5 text-gold"
+															viewBox="0 0 24 24"
+															fill="currentColor"
+															aria-hidden="true"
+														>
+															<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
 														</svg>
 														<p>{Number(item.vote_average ?? 0).toFixed(1)}</p>
 													</div>
