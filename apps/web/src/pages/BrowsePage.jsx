@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import NoPoster from '../assets/No-Poster.png';
 import MovieCardSkeleton from '../components/MovieCardSkeleton';
 import api from '../lib/axios';
 
@@ -150,7 +151,7 @@ const BrowsePage = () => {
 											src={
 												movie.poster_path
 													? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-													: '/src/assets/No-Poster.png'
+													: NoPoster
 											}
 											alt={movie.title ?? movie.name}
 											className="card-poster w-full"

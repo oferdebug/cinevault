@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
 				try {
 					posthog.reset();
 				} catch (err) {
-					console.error('posthost.reset failed', err);
+					console.error('posthog.reset failed', err);
 				}
 			}
 		});
