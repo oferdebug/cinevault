@@ -40,10 +40,9 @@ export const requireAuth = async (
 		return;
 	}
 
+	const controller = new AbortController();
+	const timer = setTimeout(() => controller.abort(), 5000);
 	try {
-		const controller = new AbortController();
-		const timer = setTimeout(() => controller.abort(), 5000);
-
 		const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
 			headers: {
 				apikey: SUPABASE_ANON_KEY,
@@ -51,8 +50,6 @@ export const requireAuth = async (
 			},
 			signal: controller.signal,
 		});
-		clearTimeout(timer);
-
 		if (!r.ok) {
 			logger.warn({ status: r.status }, 'supabase rejected token');
 			res
@@ -77,5 +74,7 @@ export const requireAuth = async (
 				message: isTimeout ? 'Auth check timed out' : 'Auth check failed',
 			},
 		});
+	} finally {
+		clearTimeout(timer);
 	}
 };
