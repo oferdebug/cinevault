@@ -13,16 +13,15 @@ export const AuthProvider = ({ children }) => {
 		(sessionUser) => {
 			if (!sessionUser) return;
 			try {
-				posthog.identify(sessionUser.id, {
+				posthog?.identify(sessionUser.id, {
 					name: sessionUser.user_metadata?.full_name || 'User',
 				});
 			} catch (err) {
-				console.error('posthog.identify failed', err);
+				console.error('posthog.identify failed:', err);
 			}
 		},
 		[posthog],
 	);
-
 	useEffect(() => {
 		supabase.auth
 			.getSession()
@@ -46,9 +45,9 @@ export const AuthProvider = ({ children }) => {
 			identifyPosthogUser(sessionUser);
 			if (!sessionUser) {
 				try {
-					posthog.reset();
+					posthog?.reset();
 				} catch (err) {
-					console.error('posthog.reset failed', err);
+					console.error('posthog.reset failed:', err);
 				}
 			}
 		});
