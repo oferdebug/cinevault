@@ -27,7 +27,7 @@ export const useUserRating = (tmdbId, mediaType) => {
 			setRating(data?.rating ?? null);
 		} catch (err) {
 			console.error('useUserRating loadRating error', err);
-			setError('Failed to save rating. Please try again later.');
+			setError('Failed to load rating. Please try again later.');
 		} finally {
 			setLoading(false);
 		}
@@ -55,7 +55,7 @@ export const useUserRating = (tmdbId, mediaType) => {
 		);
 
 		if (error) {
-			setError('Failed to save rating,please try again later');
+			setError('Failed to save rating. Please try again later.');
 		} else {
 			setRating(nextRating);
 		}

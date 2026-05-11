@@ -46,13 +46,13 @@ const TitleDetailPage = () => {
 		enabled: Boolean(id),
 	});
 
-	const saved = isInWatchlist(Number(id));
+	const saved = isInWatchlist(String(id));
 	const {
 		rating,
 		loading: ratingLoading,
 		error: ratingError,
 		saveRating,
-	} = useUserRating(Number(id), type);
+	} = useUserRating(String(id), type);
 
 	const handleToggle = async () => {
 		if (!user) {
