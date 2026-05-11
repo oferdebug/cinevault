@@ -10,8 +10,9 @@ const CheckoutSuccessPage = () => {
 
 	useEffect(() => {
 		if (fired.current) return;
+		if (!sessionId || !posthog) return;
 		fired.current = true;
-		posthog?.capture('checkout_completed', {
+		posthog.capture('checkout_completed', {
 			session_id: sessionId,
 		});
 	}, [posthog, sessionId]);

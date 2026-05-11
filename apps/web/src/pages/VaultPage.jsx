@@ -76,27 +76,28 @@ const VaultPage = () => {
 				.eq('id', item.id)
 				.eq('user_id', user.id);
 			if (error) throw error;
+		} catch (error) {
+			console.error('Vault remove DB error:', error);
+			toast.error('Failed to remove title from your vault.');
+			return;
+		}
 
+		try {
 			removeFromWatchlist(item.tmdb_id);
-
 			posthog?.capture('vault_title_removed', {
 				tmdb_id: item.tmdb_id,
 				media_type: item.media_type,
 				title: item.title,
 			});
 		} catch (error) {
-			console.error('Vault remove error:', error);
-			toast.error('Failed to remove title from your vault.');
+			console.error('Vault remove downstream error:', error);
 		} finally {
 			setRemovingId(null);
 		}
 	};
 
 	useEffect(() => {
-		if (!seedItems.length) {
-			setRecommendations([]);
-			return;
-		}
+		if (!seedItems.length) return;
 
 		let ignore = false;
 

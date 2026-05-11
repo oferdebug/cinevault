@@ -1,4 +1,7 @@
 import { usePostHog } from '@posthog/react';
+import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../lib/axios';
 import {
 	type BillingInterval,
 	getEffectiveMonthly,
@@ -6,9 +9,6 @@ import {
 	PLANS,
 	type Plan,
 } from '../lib/plans';
-import api from '../lib/axios';
-import { useNavigate } from 'react-router-dom';
-import * as React from 'react';
 import supabase from '../lib/supabase';
 
 const SubscriptionPage = () => {
@@ -17,6 +17,11 @@ const SubscriptionPage = () => {
 	const [interval, setInterval] = React.useState<BillingInterval>('monthly');
 	const [loadingPlanId, setLoadingPlanId] = React.useState<string | null>(null);
 	const [error, setError] = React.useState<string | null>(null);
+
+	const plusPlan = PLANS.find((p) => p.id === 'plus');
+	const yearlySavingsPercent = plusPlan
+		? getYearlySavingsPercent(plusPlan)
+		: 17;
 
 	const handleSubscribe = async (plan: Plan) => {
 		setLoadingPlanId(plan.id);
@@ -123,7 +128,7 @@ const SubscriptionPage = () => {
 										: 'bg-accent/15 text-accent'
 								}`}
 							>
-								Save 17%
+								Save {yearlySavingsPercent}%
 							</span>
 						</button>
 					</div>

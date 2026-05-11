@@ -1,5 +1,5 @@
 import { usePostHog } from '@posthog/react';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useEffect, useState } from 'react';
 import supabase from '../lib/supabase';
 
 const AuthContext = createContext(null);
@@ -8,21 +8,24 @@ export const AuthProvider = ({ children }) => {
 	const [user, setUser] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const posthog = usePostHog();
+
+	const identifyPosthogUser = useCallback(
+		(sessionUser) => {
+			if (!sessionUser) return;
+			posthog.identify(sessionUser.id, {
+				name: sessionUser.user_metadata?.full_name || 'User',
+			});
+		},
+		[posthog],
+	);
+
 	useEffect(() => {
 		supabase.auth
 			.getSession()
 			.then(({ data: { session } }) => {
 				const sessionUser = session?.user ?? null;
 				setUser(sessionUser);
-				if (sessionUser) {
-					posthog.identify(sessionUser.id, {
-						email: sessionUser.email,
-						name:
-							sessionUser.user_metadata?.full_name ||
-							sessionUser.email?.split('@')[0] ||
-							'User',
-					});
-				}
+				identifyPosthogUser(sessionUser);
 			})
 			.catch(() => {
 				setUser(null);
@@ -36,20 +39,14 @@ export const AuthProvider = ({ children }) => {
 		} = supabase.auth.onAuthStateChange((_event, session) => {
 			const sessionUser = session?.user ?? null;
 			setUser(sessionUser);
-			if (sessionUser) {
-				posthog.identify(sessionUser.id, {
-					email: sessionUser.email,
-					name:
-						sessionUser.user_metadata?.full_name ||
-						sessionUser.email.split('@')[0],
-				});
-			} else {
+			identifyPosthogUser(sessionUser);
+			if (!sessionUser) {
 				posthog.reset();
 			}
 		});
 
 		return () => subscription.unsubscribe();
-	}, [posthog]);
+	}, [posthog, identifyPosthogUser]);
 
 	const signInWithGoogle = () =>
 		supabase.auth.signInWithOAuth({
@@ -72,10 +69,4 @@ export const AuthProvider = ({ children }) => {
 			{children}
 		</AuthContext.Provider>
 	);
-};
-
-export const useAuth = () => {
-	const ctx = useContext(AuthContext);
-	if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
-	return ctx;
 };

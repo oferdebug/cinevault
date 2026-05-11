@@ -18,11 +18,18 @@ const queryClient = new QueryClient({
 	},
 });
 
-posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, {
-	api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
-	defaults: '2026-01-30',
-	autocapture: false,
-});
+if (
+	!import.meta.env.VITE_PUBLIC_POSTHOG_KEY ||
+	!import.meta.env.VITE_PUBLIC_POSTHOG_HOST
+) {
+	console.error('PostHog environment variables are not configured');
+} else {
+	posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, {
+		api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+		defaults: '2026-01-30',
+		autocapture: false,
+	});
+}
 
 createRoot(document.getElementById('root')).render(
 	<StrictMode>

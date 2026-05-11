@@ -77,7 +77,6 @@ const TitleDetailPage = () => {
 				posthog?.capture('vault_title_removed', {
 					tmdb_id: Number(id),
 					media_type: type,
-					title: name,
 				});
 			} else {
 				const { error } = await supabase.from('watchlist').insert({
@@ -99,7 +98,6 @@ const TitleDetailPage = () => {
 				posthog?.capture('vault_title_added', {
 					tmdb_id: Number(id),
 					media_type: type,
-					title: name,
 				});
 			}
 		} catch (error) {
