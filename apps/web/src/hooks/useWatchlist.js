@@ -71,7 +71,7 @@ export const useWatchlist = (tmdbId) => {
 				if (error) throw error;
 				setSaved(false);
 			} else {
-				const { error } = await supabase.from('watchlist').insert({
+				const { error: insertError } = await supabase.from('watchlist').insert({
 					user_id: user.id,
 					tmdb_id: tmdbId,
 					...movieData,
@@ -81,12 +81,12 @@ export const useWatchlist = (tmdbId) => {
 			}
 		} catch (err) {
 			console.error('useWatchlist toggle error', err);
-			if (err?.message?.includes('vault limit reached')) {
+			if (err?.message?.includes('vault_limit_reached')) {
 				setError(
-					'vault limit reached,please upgrade to a paid plan to add more titles',
+					'Vault limit reached. Please upgrade to a paid plan to add more titles.',
 				);
 			} else {
-				setError('generic error,please try again later');
+				setError('An error occurred. Please try again later.');
 			}
 		} finally {
 			setLoading(false);
