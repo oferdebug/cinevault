@@ -27,12 +27,7 @@ app.use(
 	}),
 );
 
-app.use(
-	'/billing/webhook',
-	express.raw({ type: 'application/json' }),
-	billingRouter,
-);
-
+app.use('/billing/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json({ limit: '100kb' }));
 
 app.use('/catalog', catalogRouter);
