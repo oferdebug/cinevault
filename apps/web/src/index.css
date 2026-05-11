@@ -39,7 +39,8 @@
 			ellipse 60% 40% at 80% 20%,
 			rgba(129, 140, 248, 0.1),
 			transparent
-		), linear-gradient(180deg, #0a0e1a 0%, #080b14 60%, #0a0e1a 100%);
+		),
+		linear-gradient(180deg, #0a0e1a 0%, #080b14 60%, #0a0e1a 100%);
 }
 
 @layer base {

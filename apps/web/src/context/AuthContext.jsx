@@ -12,9 +12,13 @@ export const AuthProvider = ({ children }) => {
 	const identifyPosthogUser = useCallback(
 		(sessionUser) => {
 			if (!sessionUser) return;
-			posthog.identify(sessionUser.id, {
-				name: sessionUser.user_metadata?.full_name || 'User',
-			});
+			try {
+				posthog.identify(sessionUser.id, {
+					name: sessionUser.user_metadata?.full_name || 'User',
+				});
+			} catch (err) {
+				console.error('posthog.identify failed', err);
+			}
 		},
 		[posthog],
 	);
@@ -41,7 +45,11 @@ export const AuthProvider = ({ children }) => {
 			setUser(sessionUser);
 			identifyPosthogUser(sessionUser);
 			if (!sessionUser) {
-				posthog.reset();
+				try {
+					posthog.reset();
+				} catch (err) {
+					console.error('posthost.reset failed', err);
+				}
 			}
 		});
 

@@ -74,28 +74,28 @@ export const HomePage = () => {
 			: `${activeFilter} Titles`;
 	const filteredMovies = Array.isArray(movies)
 		? movies.filter((movie) => {
-			if (activeFilter === 'All') return true;
+				if (activeFilter === 'All') return true;
 
-			if (activeFilter === 'Movies') {
-				return (movie.media_type ?? 'movie') === 'movie';
-			}
+				if (activeFilter === 'Movies') {
+					return (movie.media_type ?? 'movie') === 'movie';
+				}
 
-			if (activeFilter === 'Series') {
-				return movie.media_type === 'tv';
-			}
+				if (activeFilter === 'Series') {
+					return movie.media_type === 'tv';
+				}
 
-			if (activeFilter === 'Hidden Gems') {
-				return movie.vote_average >= 7 && movie.vote_count < 3000;
-			}
+				if (activeFilter === 'Hidden Gems') {
+					return movie.vote_average >= 7 && movie.vote_count < 3000;
+				}
 
-			const genreIds = genreFilterMap[activeFilter];
+				const genreIds = genreFilterMap[activeFilter];
 
-			if (genreIds) {
-				return movie.genre_ids?.some((genreId) => genreIds.includes(genreId));
-			}
+				if (genreIds) {
+					return movie.genre_ids?.some((genreId) => genreIds.includes(genreId));
+				}
 
-			return true;
-		})
+				return true;
+			})
 		: [];
 	return (
 		<main className="relative min-h-screen overflow-x-hidden bg-primary">
@@ -113,8 +113,7 @@ export const HomePage = () => {
 						Discover &amp; Watch
 					</p>
 					<h1>
-						Stop Scrolling{' '}
-						<span className="text-gradient">Tonight</span>
+						Stop Scrolling <span className="text-gradient">Tonight</span>
 						<br />
 						Unlock Your Next Watch.
 					</h1>
@@ -125,8 +124,19 @@ export const HomePage = () => {
 
 				<div className="search max-w-2xl mx-auto">
 					<div>
-						<svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 h-5 w-5 text-accent/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-							<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							className="absolute left-3 h-5 w-5 text-accent/60"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							aria-hidden="true"
+						>
+							<circle cx="11" cy="11" r="8" />
+							<line x1="21" y1="21" x2="16.65" y2="16.65" />
 						</svg>
 						<input
 							type="text"
@@ -158,7 +168,9 @@ export const HomePage = () => {
 					<div className="flex items-baseline gap-3 mb-6">
 						<h2 className="mb-0">{sectionTitle}</h2>
 						{!isLoading && filteredMovies.length > 0 && (
-							<span className="text-sm text-gray-100">{filteredMovies.length} titles</span>
+							<span className="text-sm text-gray-100">
+								{filteredMovies.length} titles
+							</span>
 						)}
 					</div>
 

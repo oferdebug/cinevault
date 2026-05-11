@@ -16,7 +16,8 @@ const VaultPage = () => {
 	const navigate = useNavigate();
 	const { user, loading: authLoading } = useAuth();
 	const posthog = usePostHog();
-	const { vaultItems, removeFromWatchlist, loading } = useWatchlistContext();
+	const { vaultItems, removeFromWatchlist, addToWatchlist, loading } =
+		useWatchlistContext();
 	const { ratings } = useUserRatings();
 	const [removingId, setRemovingId] = useState(null);
 	const [recommendations, setRecommendations] = useState([]);
@@ -37,6 +38,7 @@ const VaultPage = () => {
 			};
 		});
 	}, [vaultItems, ratings]);
+
 	const seedItems = useMemo(
 		() => getRecommendationSeeds(enrichedItems, vaultStats),
 		[enrichedItems, vaultStats],
@@ -69,6 +71,8 @@ const VaultPage = () => {
 
 	const handleRemove = async (item) => {
 		setRemovingId(item.id);
+		removeFromWatchlist(item.tmdb_id);
+
 		try {
 			const { error } = await supabase
 				.from('watchlist')
@@ -76,21 +80,23 @@ const VaultPage = () => {
 				.eq('id', item.id)
 				.eq('user_id', user.id);
 			if (error) throw error;
+
+			try {
+				posthog?.capture('vault_title_removed', {
+					tmdb_id: item.tmdb_id,
+					media_type: item.media_type,
+					title: item.title,
+				});
+			} catch (analyticsErr) {
+				console.error(
+					'posthog.capture(vault_title_removed) failed:',
+					analyticsErr,
+				);
+			}
 		} catch (error) {
 			console.error('Vault remove DB error:', error);
+			addToWatchlist(item);
 			toast.error('Failed to remove title from your vault.');
-			return;
-		}
-
-		try {
-			removeFromWatchlist(item.tmdb_id);
-			posthog?.capture('vault_title_removed', {
-				tmdb_id: item.tmdb_id,
-				media_type: item.media_type,
-				title: item.title,
-			});
-		} catch (error) {
-			console.error('Vault remove downstream error:', error);
 		} finally {
 			setRemovingId(null);
 		}

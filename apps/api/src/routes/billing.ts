@@ -11,7 +11,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { Router, raw } from 'express';
+import { Router } from 'express';
 import pino from 'pino';
 import Stripe from 'stripe';
 import { z } from 'zod';
@@ -130,7 +130,7 @@ router.post('/checkout', requireAuth, async (req, res) => {
 	}
 });
 
-router.post('/webhook', raw({ type: 'application/json' }), async (req, res) => {
+router.post('/webhook', async (req, res) => {
 	const sig = req.headers['stripe-signature'];
 	if (!sig || typeof sig !== 'string') {
 		res.status(400).send('Missing stripe-signature header');

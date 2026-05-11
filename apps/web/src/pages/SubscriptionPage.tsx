@@ -49,16 +49,22 @@ const SubscriptionPage = () => {
 				setError('This plan is not available for the selected interval.');
 				return;
 			}
-
-			posthog?.capture(
-				'subscribe_clicked',
-				{
-					plan_id: plan.id,
-					billing_interval: interval,
-					price_id: priceId,
-				},
-				{ send_instantly: true },
-			);
+			try {
+				posthog?.capture(
+					'subscribe_clicked',
+					{
+						plan_id: plan.id,
+						billing_interval: interval,
+						price_id: priceId,
+					},
+					{ send_instantly: true },
+				);
+			} catch (analyticsErr) {
+				console.error(
+					'posthog.capture(subscribe_clicked) failed:',
+					analyticsErr,
+				);
+			}
 
 			const { data } = await api.post('/billing/checkout', { priceId });
 			if (data?.ok && data.data?.url) {

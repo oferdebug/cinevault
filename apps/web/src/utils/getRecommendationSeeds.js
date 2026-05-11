@@ -1,4 +1,4 @@
-import { getVaultStats } from "./getVaultStats";
+import { getVaultStats } from './getVaultStats';
 
 export const getRecommendationSeeds = (items = [], stats) => {
 	if (!items.length) return [];
@@ -11,8 +11,8 @@ export const getRecommendationSeeds = (items = [], stats) => {
 		)[0] ?? null;
 
 	const total = items.length;
-	const movieCount = items.filter((item) => item.media_type === "movie").length;
-	const seriesCount = items.filter((item) => item.media_type === "tv").length;
+	const movieCount = items.filter((item) => item.media_type === 'movie').length;
+	const seriesCount = items.filter((item) => item.media_type === 'tv').length;
 	const dominantRatio = Math.max(movieCount, seriesCount) / total;
 
 	let differentTypeItem = null;

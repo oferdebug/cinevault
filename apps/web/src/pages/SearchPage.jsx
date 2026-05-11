@@ -60,8 +60,19 @@ const SearchPage = () => {
 
 				<div className="search mx-auto mt-6 max-w-2xl">
 					<div>
-						<svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 h-5 w-5 text-accent/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-							<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							className="absolute left-3 h-5 w-5 text-accent/60"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							aria-hidden="true"
+						>
+							<circle cx="11" cy="11" r="8" />
+							<line x1="21" y1="21" x2="16.65" y2="16.65" />
 						</svg>
 						<input
 							type="text"
@@ -90,7 +101,10 @@ const SearchPage = () => {
 					)}
 
 					{canSearch && isError && (
-						<p role="alert" className="py-10 text-center text-danger/80 text-sm">
+						<p
+							role="alert"
+							className="py-10 text-center text-danger/80 text-sm"
+						>
 							Failed to load search results.
 						</p>
 					)}
@@ -104,13 +118,20 @@ const SearchPage = () => {
 					{titleResults.length > 0 && (
 						<>
 							<div className="flex items-baseline gap-3 mb-6">
-								<h2 className="mb-0">Results for &quot;{debouncedQuery}&quot;</h2>
-								<span className="text-sm text-gray-100">{titleResults.length} titles</span>
+								<h2 className="mb-0">
+									Results for &quot;{debouncedQuery}&quot;
+								</h2>
+								<span className="text-sm text-gray-100">
+									{titleResults.length} titles
+								</span>
 							</div>
 							<div className="all-movies">
 								<ul>
 									{titleResults.map((movie) => (
-										<MovieCard key={`${movie.media_type}-${movie.id}`} movie={movie} />
+										<MovieCard
+											key={`${movie.media_type}-${movie.id}`}
+											movie={movie}
+										/>
 									))}
 								</ul>
 							</div>

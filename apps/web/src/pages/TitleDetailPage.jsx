@@ -74,10 +74,17 @@ const TitleDetailPage = () => {
 					.eq('tmdb_id', Number(id));
 				if (error) throw error;
 				removeFromWatchlist(Number(id));
-				posthog?.capture('vault_title_removed', {
-					tmdb_id: Number(id),
-					media_type: type,
-				});
+				try {
+					posthog?.capture('vault_title_removed', {
+						tmdb_id: Number(id),
+						media_type: type,
+					});
+				} catch (analyticsErr) {
+					console.error(
+						'posthog.capture(vault_title_removed) failed:',
+						analyticsErr,
+					);
+				}
 			} else {
 				const { error } = await supabase.from('watchlist').insert({
 					user_id: user.id,
@@ -95,10 +102,17 @@ const TitleDetailPage = () => {
 					poster_path: title.poster_path,
 					vote_average: title.vote_average ?? 0,
 				});
-				posthog?.capture('vault_title_added', {
-					tmdb_id: Number(id),
-					media_type: type,
-				});
+				try {
+					posthog?.capture('vault_title_added', {
+						tmdb_id: Number(id),
+						media_type: type,
+					});
+				} catch (analyticsErr) {
+					console.error(
+						'posthog.capture(vault_title_added) failed:',
+						analyticsErr,
+					);
+				}
 			}
 		} catch (error) {
 			console.error('Vault toggle error:', error);

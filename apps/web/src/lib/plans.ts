@@ -36,7 +36,11 @@ export const PLANS: Plan[] = [
 		description: 'Start building your personal vault.',
 		monthlyPrice: 0,
 		yearlyPrice: 0,
-		features: ['Up to 20 saved titles', 'Basic recommendations', 'Basic insights'],
+		features: [
+			'Up to 20 saved titles',
+			'Basic recommendations',
+			'Basic insights',
+		],
 		cta: 'Get Started',
 		stripePriceIds: { monthly: null, yearly: null },
 		limits: {
@@ -56,7 +60,13 @@ export const PLANS: Plan[] = [
 		description: 'For people who want smarter discovery.',
 		monthlyPrice: 7.99,
 		yearlyPrice: 79.9,
-		features: ['Unlimited Vault', 'Smart recommendations', 'User ratings', 'Advanced insights', 'Continue Watching'],
+		features: [
+			'Unlimited Vault',
+			'Smart recommendations',
+			'User ratings',
+			'Advanced insights',
+			'Continue Watching',
+		],
 		cta: 'Upgrade to Plus',
 		popular: true,
 		stripePriceIds: {
@@ -80,7 +90,12 @@ export const PLANS: Plan[] = [
 		description: 'For households and power users.',
 		monthlyPrice: 12.99,
 		yearlyPrice: 129.9,
-		features: ['Everything in Plus', 'Family profiles', 'Priority recommendations', 'Early access features'],
+		features: [
+			'Everything in Plus',
+			'Family profiles',
+			'Priority recommendations',
+			'Early access features',
+		],
 		cta: 'Choose Premium',
 		stripePriceIds: {
 			monthly: 'price_1TTaIsCwR3az2cfPP6lFyo8X',
