@@ -27,6 +27,11 @@ app.use(
 	}),
 );
 
+// IMPORTANT: Stripe signature verification requires the raw Buffer body.
+// This raw middleware MUST be registered before express.json() so that
+// req.body for /billing/webhook stays a Buffer. Other routes are unaffected
+// and get parsed JSON via express.json() below.
+
 app.use('/billing/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json({ limit: '100kb' }));
 
