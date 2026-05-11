@@ -2,6 +2,7 @@ import { usePostHog } from '@posthog/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import NoPoster from '../assets/No-Poster.png';
 import MovieCard from '../components/MovieCard';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlistContext } from '../context/WatchlistContext';
@@ -349,7 +350,7 @@ const VaultPage = () => {
 							{vaultItems.map((item) => {
 								const posterSrc = item.poster_path
 									? `https://image.tmdb.org/t/p/w500${item.poster_path}`
-									: '/src/assets/No-Poster.png';
+									: NoPoster;
 
 								return (
 									<li

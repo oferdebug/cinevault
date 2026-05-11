@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import NoPoster from '../assets/No-Poster.png';
 
 const pickerOptions = {
 	type: [
@@ -218,7 +219,7 @@ const UnlockPicker = ({ titles = [] }) => {
 									src={
 										pickedTitle.poster_path
 											? `https://image.tmdb.org/t/p/w185${pickedTitle.poster_path}`
-											: '/src/assets/No-Poster.png'
+											: NoPoster
 									}
 									alt={pickedTitle.title ?? pickedTitle.name}
 									className="h-32 w-24 rounded-xl object-cover"

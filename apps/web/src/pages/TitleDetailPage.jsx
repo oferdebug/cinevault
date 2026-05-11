@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import NoPoster from '../assets/No-Poster.png';
 import MovieCard from '../components/MovieCard';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlistContext } from '../context/WatchlistContext';
@@ -156,7 +157,7 @@ const TitleDetailPage = () => {
 		: null;
 	const poster = title.poster_path
 		? `https://image.tmdb.org/t/p/w500${title.poster_path}`
-		: '/src/assets/No-Poster.png';
+		: NoPoster;
 
 	return (
 		<main className="min-h-screen bg-primary">
@@ -344,7 +345,7 @@ const TitleDetailPage = () => {
 											src={
 												person.profile_path
 													? `https://image.tmdb.org/t/p/w185${person.profile_path}`
-													: '/src/assets/No-Poster.png'
+													: NoPoster
 											}
 											alt={person.name}
 											className="w-full h-full object-cover"

@@ -2,6 +2,7 @@ import { usePostHog } from '@posthog/react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import NoPoster from '../assets/No-Poster.png';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlistContext } from '../context/WatchlistContext';
 import supabase from '../lib/supabase';
@@ -48,7 +49,7 @@ const MovieCard = ({ movie }) => {
 	const mediaType = movie.media_type ?? 'movie';
 	const posterSrc = movie.poster_path
 		? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-		: '/src/assets/No-Poster.png';
+		: NoPoster;
 
 	const handleVaultClick = async (event) => {
 		event.stopPropagation();
