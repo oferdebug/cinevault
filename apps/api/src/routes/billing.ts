@@ -53,7 +53,7 @@ const supabaseAdmin = createClient(
 	SUPABASE_URL as string,
 	SUPABASE_SERVICE_ROLE_KEY as string,
 	{
-	auth: { autoRefreshToken: false, persistSession: false },
+		auth: { autoRefreshToken: false, persistSession: false },
 	},
 );
 const ALLOWED_PRICE_IDS = new Set([
@@ -309,6 +309,9 @@ router.get('/me', requireAuth, async (req, res) => {
 		res.json({ ok: true, data: { subscription: data } });
 	} catch (err) {
 		logger.error({ err, userId: user.id }, 'failed to get subscription');
+		res
+			.status(500)
+			.json({ ok: false, error: { message: 'Failed to get subscription' } });
 	}
 });
 
