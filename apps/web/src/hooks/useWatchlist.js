@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import supabase from '../lib/supabase';
-
+import { isVaultLimitError } from '../utils/errors';
 export const useWatchlist = (tmdbId) => {
 	const { user } = useAuth();
 	const [saved, setSaved] = useState(false);
@@ -81,9 +81,9 @@ export const useWatchlist = (tmdbId) => {
 			}
 		} catch (err) {
 			console.error('useWatchlist toggle error', err);
-			if (err?.message?.includes('vault_limit_reached')) {
+			if (isVaultLimitError(err)) {
 				setError(
-					'Vault limit reached. Please upgrade to a paid plan to add more titles.',
+					'Vault limit reached. Please Upgrade to a paid plan to add more titles.',
 				);
 			} else {
 				setError('An error occurred. Please try again later.');

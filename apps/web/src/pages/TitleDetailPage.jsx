@@ -10,6 +10,7 @@ import { useWatchlistContext } from '../context/WatchlistContext';
 import { useUserRating } from '../hooks/useUserRating';
 import api from '../lib/axios';
 import supabase from '../lib/supabase';
+import { isVaultLimitError } from '../utils/errors';
 
 const fetchTitle = async (id, type) => {
 	const { data } = await api.get(`/catalog/title/${id}?type=${type}`);
@@ -116,7 +117,7 @@ const TitleDetailPage = () => {
 			}
 		} catch (error) {
 			console.error('Vault toggle error:', error);
-			if (error?.message?.includes('vault_limit_reached')) {
+			if (isVaultLimitError(error)) {
 				toast.error('Vault full', {
 					description:
 						'Free plan is limited to 20 titles. Upgrade to Plus for unlimited access.',

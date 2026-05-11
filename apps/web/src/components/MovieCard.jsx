@@ -6,6 +6,7 @@ import NoPoster from '../assets/No-Poster.png';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlistContext } from '../context/WatchlistContext';
 import supabase from '../lib/supabase';
+import { isVaultLimitError } from '../utils/errors';
 
 const IconBookmark = ({ filled }) => (
 	<svg
@@ -105,7 +106,7 @@ const MovieCard = ({ movie }) => {
 			}
 		} catch (error) {
 			console.error('Vault toggle error:', error);
-			if (error?.message?.includes('vault_limit_reached')) {
+			if (isVaultLimitError(error)) {
 				toast.error('Vault full', {
 					description:
 						'Free plan is limited to 20 titles. Upgrade to Plus for unlimited access.',
