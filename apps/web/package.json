@@ -23,7 +23,7 @@
 		"zustand": "^5.0.12"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.0.6",
+		"@biomejs/biome": "2.4.15",
 		"@eslint/js": "^10.0.1",
 		"@tailwindcss/vite": "^4.2.4",
 		"@tanstack/react-query-devtools": "^5.100.6",
